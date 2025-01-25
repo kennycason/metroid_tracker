@@ -1,0 +1,251 @@
+:root {
+    --background-color: #1a1a1a;
+    --text-color: #e0e0e0;
+    --accent-color: #ff6b6b;
+    --panel-bg: #2a2a2a;
+    --header-height: 60px;  /* New variable for header height */
+    --tile-size: 32px;
+    --tile-gap: 1px;
+    --tile-total: 33px;  /* tile-size + gap */
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-family: 'Arial', sans-serif;
+    height: 100vh;  /* Full viewport height */
+    overflow: hidden;  /* Prevent scrolling */
+}
+
+.container {
+    max-width: 100%;  /* Full width */
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    text-align: center;
+    height: var(--header-height);
+    background-color: var(--panel-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid var(--accent-color);
+}
+
+h1 {
+    color: var(--accent-color);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 0;  /* Remove margin */
+    font-size: 1.5em;  /* Slightly smaller */
+}
+
+.tracker-container {
+    display: flex;
+    flex: 1;  /* Fill remaining space */
+    height: calc(100vh - var(--header-height));
+}
+
+.stats-panel {
+    background-color: var(--panel-bg);
+    padding: 20px;
+    min-width: 200px;  /* Reduced from 240px */
+    max-width: 200px;  /* Reduced from 240px */
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--accent-color);
+}
+
+.stats-header {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--accent-color);
+    display: flex;
+    gap: 15px;  /* Reduced from 20px */
+    justify-content: flex-start;
+    align-items: center;  /* Center items vertically */
+}
+
+.total-counter {
+    display: flex;
+    align-items: center;
+    gap: 8px;  /* Reduced from 12px */
+    white-space: nowrap;  /* Prevent wrapping */
+}
+
+.item-counter {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    gap: 10px;
+}
+
+.item-counter img {
+    width: 30px;
+    height: 30px;
+}
+
+.map-container {
+    position: relative;
+    flex: 1;
+    overflow: hidden;
+    padding: 0;
+    display: flex;
+    background-color: var(--background-color);
+    cursor: zoom-in;  /* Show zoom cursor */
+}
+
+#metroid-map {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: left top;
+    display: block;
+    transform-origin: 0 0;  /* Set transform origin to top-left */
+}
+
+/* Remove the absolute positioning version since we're using transform scale */
+/* #metroid-map {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    margin: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+} */
+
+.item-marker {
+    position: absolute;
+    pointer-events: none;
+    z-index: 11;  /* Higher than overlay */
+    width: 32px;  /* Bigger for testing */
+    height: 32px;  /* Bigger for testing */
+    border: 2px solid yellow;  /* Visible border */
+    background-color: rgba(255, 0, 0, 0.5);  /* More visible background */
+}
+
+/* Make the sprites more visible for testing */
+.item-marker .sprite {
+    width: 32px;  /* Bigger for testing */
+    height: 32px;  /* Bigger for testing */
+    background-color: rgba(0, 255, 0, 0.5);  /* Visible background */
+    border: 2px solid white;  /* Visible border */
+}
+
+/* Specific marker types */
+.energy-marker {
+    background-color: rgba(255, 0, 0, 0.5) !important;
+}
+
+.missile-marker {
+    background-color: rgba(0, 255, 0, 0.5) !important;
+}
+
+#item-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;  /* Increased z-index */
+}
+
+/* Temporarily disabled magnifier styles
+.magnifier {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    pointer-events: none;
+    background-repeat: no-repeat;
+    border: 2px solid var(--accent-color);
+    display: none;
+    z-index: 1000;
+    transform: translate(-50%, -50%);
+}
+*/
+
+.item-section {
+    margin-bottom: 20px;
+}
+
+.item-section:first-child {
+    margin-top: 0;
+}
+
+.item-section h3 {
+    color: var(--accent-color);
+    margin-bottom: 10px;
+}
+
+.item-entry {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 5px;
+    cursor: pointer;
+    padding: 5px;
+    font-size: 0.85em;  /* Slightly smaller */
+    white-space: nowrap;  /* Prevent wrapping */
+}
+
+.item-entry:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.item-entry span {
+    overflow: hidden;
+    text-overflow: ellipsis;  /* Show ... if text overflows */
+}
+
+.item-circle {
+    width: 12px;
+    height: 12px;
+    border: 2px solid var(--accent-color);
+    border-radius: 50%;
+}
+
+.item-circle.collected {
+    background-color: var(--accent-color);
+}
+
+/* Add sprite system */
+.sprite {
+    width: 32px;
+    height: 32px;
+    display: inline-block;
+    background-image: url('metroid_sprites.jpg');
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+    transform: scale(1);
+    transform-origin: left center;
+}
+
+.sprite-energy {
+    background-position: calc(-3 * var(--tile-size)) calc(-9 * var(--tile-size));
+}
+
+.sprite-missile {
+    background-position: calc(-4 * var(--tile-size)) calc(-11 * var(--tile-size));
+}
+
+/* Add scrolling for item list if it gets too long */
+.items-list {
+    overflow-y: scroll;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE and Edge */
+    max-height: calc(100vh - var(--header-height) - 140px);
+}
+
+.items-list::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metroid Item Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Metroid Item Tracker</h1>
+        </header>
+        
+        <div class="tracker-container">
+            <div class="stats-panel">
+                <div class="stats-header">
+                    <div class="total-counter">
+                        <i class="sprite sprite-energy"></i>
+                        <span id="energy-count">0</span>/6
+                    </div>
+                    <div class="total-counter">
+                        <i class="sprite sprite-missile"></i>
+                        <span id="missile-count">0</span>/255
+                    </div>
+                </div>
+                <div class="items-list">
+                    <!-- Dynamic items will be inserted here -->
+                </div>
+            </div>
+            
+            <div class="map-container">
+                <img id="metroid-map" src="map.png" alt="Metroid Map">
+                <div id="item-overlay"></div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html> 
