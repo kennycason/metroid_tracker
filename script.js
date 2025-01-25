@@ -79,6 +79,21 @@ function initializeMapZoom() {
         isHovering = false;
     });
 
+    // Add click handler for coordinate logging
+    $mapContainer.on('click', (e) => {
+        if (isDragging) return; // Don't log if we're dragging
+        
+        const rect = $mapContainer[0].getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        // Calculate actual coordinates taking into account scale and offset
+        const actualX = Math.round((mouseX - offsetX) / scale);
+        const actualY = Math.round((mouseY - offsetY) / scale);
+        
+        console.log(`Clicked coordinates - x: ${actualX}, y: ${actualY}`);
+    });
+
     // Add drag functionality
     $mapContainer.on('mousedown', (e) => {
         if (scale > 1) {  // Only allow dragging when zoomed in
@@ -162,63 +177,76 @@ function initializeMapZoom() {
             'transform': `translate(${offsetX}px, ${offsetY}px) scale(${scale})`
         });
 
-        // Update individual markers to counter the map scale
+        // Update individual markers to counter the map scale, but cap at 2x original size
         $('.item-marker').css({
-            transform: `scale(${1/scale})`
+            transform: `scale(${Math.min(2, 1/scale)})`
         });
     }
 }
 
+// Group types for section ordering
+const sectionOrder = ["bosses", "items", "energy", "missile"];
+const itemTypes = {
+    "bosses": ["kraid", "ridley"],
+    "items": [
+        "morph_ball", 
+        "bombs", 
+        "hi_jump", 
+        "varia_suit", 
+        "screw_attack", 
+        "long_beam", 
+        "ice_beam", 
+        "wave_beam"
+    ],
+    "energy": ["energy"],
+    "missile": ["missile"]
+};
+
 const items = {
-    // Energy Tanks
-    1: {x: 600, y: 950, type: "energy"},
-    2: {x: 650, y: 950, type: "energy"},
-    3: {x: 700, y: 950, type: "energy"},
-    4: {x: 750, y: 950, type: "energy"},
-    5: {x: 800, y: 950, type: "energy"},
-    6: {x: 850, y: 950, type: "energy"},
+    1: {type: "kraid", x: 376, y: 1387, area: "kraids_lair", name: "Kraid", order100Percent: 34},
+    2: {type: "ridley", x: 861, y: 1386, area: "ridleys_lair", name: "Ridley", order100Percent: 41},
+    // Items
+    100: {type: "morph_ball", x: 75, y: 660, area: "brinstar", name: "Morph Ball", order100Percent: 2},
+    101: {type: "bombs", x: 1275, y: 208, area: "brinstar", name: "Bombs", order100Percent: 6},
+    102: {type: "hi_jump", x: 1382, y: 796, area: "norfair", name: "Hi Jump", order100Percent: 10},
+    103: {type: "varia_suit", x: 760, y: 66, area: "brinstar", name: "Varia Suit", order100Percent: 25},
+    104: {type: "screw_attack", x: 759, y: 746, area: "norfair", name: "Screw Attack", order100Percent: 19},
+    105: {type: "long_beam", x: 347, y: 211, area: "brinstar", name: "Long Beam", order100Percent: 4},
+    106: {type: "ice_beam", x: 969, y: 401, area: "brinstar", name: "Ice Beam Br", order100Percent: 43},
+    107: {type: "ice_beam", x: 1327, y: 556, area: "norfair", name: "Ice Beam No", order100Percent: 16},
+    108: {type: "wave_beam", x: 915, y: 990, area: "norfair", name: "Wave Beam", order100Percent: 23},  
+
+    201: {type: "energy", x: 1275, y: 324, area: "brinstar", name: "Energy Tank", order100Percent: 5},
+    202: {type: "energy", x: 1316, y: 897, area: "norfair", name: "Energy Tank", order100Percent: 20},     
+    203: {type: "energy", x: 1222, y: 116, area: "brinstar", name: "Energy Tank", order100Percent: 27}, 
+    204: {type: "energy", x: 491, y: 1049, area: "kraids_lair", name: "Energy Tank", order100Percent: 32},
+    205: {type: "energy", x: 406, y: 1405, area: "norfair", name: "Energy Tank", order100Percent: 35},
+    206: {type: "energy", x: 848, y: 1190, area: "ridleys_lair", name: "Energy Tank", order100Percent: 38},
+    207: {type: "energy", x: 756, y: 1388, area: "ridleys_lair", name: "Energy Tank", order100Percent: 42},
+    208: {type: "energy", x: 419, y: 642, area: "brinstar", name: "Energy Tank", order100Percent: 44},
 
     // Missiles
-    7: {x: 900, y: 950, type: "missile"},
-    8: {x: 950, y: 950, type: "missile"},
-    9: {x: 1000, y: 400, type: "missile"},
-    10: {x: 950, y: 400, type: "missile"},
-    11: {x: 1000, y: 320, type: "missile"},
-    12: {x: 950, y: 320, type: "missile"},
-    13: {x: 1000, y: 280, type: "missile"},
-    14: {x: 950, y: 280, type: "missile"},
-    15: {x: 900, y: 280, type: "missile"},
-    16: {x: 920, y: 350, type: "missile"},
-    17: {x: 800, y: 480, type: "missile"},
-    18: {x: 700, y: 450, type: "missile"},
-    19: {x: 650, y: 500, type: "missile"},
-    20: {x: 900, y: 600, type: "missile"},
-    21: {x: 700, y: 700, type: "missile"},
-    22: {x: 750, y: 700, type: "missile"},
-    23: {x: 800, y: 700, type: "missile"},
-    24: {x: 900, y: 750, type: "missile"},
-    25: {x: 520, y: 50, type: "missile"},
-    26: {x: 850, y: 50, type: "missile"},
-    27: {x: 950, y: 50, type: "missile"},
-    28: {x: 200, y: 600, type: "missile"},
-    29: {x: 250, y: 600, type: "missile"},
-    30: {x: 200, y: 700, type: "missile"},
-    31: {x: 250, y: 700, type: "missile"},
-    32: {x: 300, y: 700, type: "missile"},
-    33: {x: 350, y: 750, type: "missile"},
-    34: {x: 150, y: 800, type: "missile"},
-    35: {x: 200, y: 800, type: "missile"},
-    36: {x: 250, y: 800, type: "missile"},
-    37: {x: 600, y: 800, type: "missile"},
-    38: {x: 900, y: 800, type: "missile"},
-    39: {x: 700, y: 900, type: "missile"},
-    40: {x: 800, y: 850, type: "missile"},
-    41: {x: 500, y: 900, type: "missile"},
-    42: {x: 400, y: 900, type: "missile"},
-    43: {x: 600, y: 250, type: "missile"},
-    44: {x: 180, y: 480, type: "missile"},
-    45: {x: 150, y: 50, type: "missile"},
-    46: {x: 120, y: 350, type: "missile"}
+    301: {type: "missile", x: 910, y: 507, area: "brinstar", name: "Missile", order100Percent: 3},
+    302: {type: "missile", x: 902, y: 648, area: "norfair", name: "Missile", order100Percent: 8},
+    303: {type: "missile", x: 849, y: 697, area: "norfair", name: "Missile", order100Percent: 9},
+    304: {type: "missile", x: 1421, y: 509, area: "norfair", name: "Missile", order100Percent: 11},
+    305: {type: "missile", x: 1369, y: 505, area: "norfair", name: "Missile", order100Percent: 12},
+    306: {type: "missile", x: 1316, y: 502, area: "norfair", name: "Missile", order100Percent: 13},
+    307: {type: "missile", x: 1421, y: 457, area: "norfair", name: "Missile", order100Percent: 14},
+    308: {type: "missile", x: 1369, y: 460, area: "norfair", name: "Missile", order100Percent: 15},
+    309: {type: "missile", x: 1005, y: 701, area: "norfair", name: "Missile", order100Percent: 17},
+    310: {type: "missile", x: 950, y: 699, area: "norfair", name: "Missile", order100Percent: 18},
+    311: {type: "missile", x: 950, y: 1046, area: "norfair", name: "Missile", order100Percent: 21},
+    312: {type: "missile", x: 1010, y: 1045, area: "norfair", name: "Missile", order100Percent: 22},
+    313: {type: "missile", x: 1428, y: 945, area: "norfair", name: "Missile", order100Percent: 24},
+    314: {type: "missile", x: 1222, y: 116, area: "brinstar", name: "Missile", order100Percent: 26},
+    315: {type: "missile", x: 441, y: 994, area: "kraids_lair", name: "Missile", order100Percent: 29},
+    316: {type: "missile", x: 182, y: 997, area: "kraids_lair", name: "Missile", order100Percent: 30},
+    317: {type: "missile", x: 234, y: 1285, area: "kraids_lair", name: "Missile", order100Percent: 31},
+    318: {type: "missile", x: 491, y: 1185, area: "kraids_lair", name: "Missile", order100Percent: 33},
+    320: {type: "missile", x: 922, y: 1142, area: "ridleys_lair", name: "Missile", order100Percent: 37},
+    321: {type: "missile", x: 1029, y: 1436, area: "ridleys_lair", name: "Missile", order100Percent: 39},
+    322: {type: "missile", x: 1237, y: 1289, area: "ridleys_lair", name: "Missile", order100Percent: 40},
 };
 
 // Collection state array
@@ -240,54 +268,75 @@ function updateItemList() {
 
     // Update counters
     const energyCount = collectedItems.filter((collected, index) => 
-        collected && items[index + 1].type === 'energy'
+        collected && items[index + 1]?.type === 'energy'
     ).length;
     
-    const missileCount = collectedItems.filter((collected, index) => 
-        collected && items[index + 1].type === 'missile'
+    const missileContainers = collectedItems.filter((collected, index) => 
+        collected && items[index + 1]?.type === 'missile'
     ).length;
+    const missileCount = missileContainers * 5; // Each container gives 5 missiles
 
     $('#energy-count').text(energyCount);
     $('#missile-count').text(missileCount);
 
-    // Create sections for each type
-    Object.entries(itemsByType).forEach(([type, typeItems]) => {
+    // Create sections in the specified order
+    sectionOrder.forEach((section) => {
         const $section = $('<div>', {
             class: 'item-section'
         });
         
         $section.append($('<h3>', {
-            text: type.charAt(0).toUpperCase() + type.slice(1)
+            text: section.charAt(0).toUpperCase() + section.slice(1)
         }));
 
-        typeItems.forEach((item) => {
+        // Get all items that belong to this section's types
+        const sectionItems = [];
+        itemTypes[section].forEach(type => {
+            if (itemsByType[type]) {
+                sectionItems.push(...itemsByType[type]);
+            }
+        });
+
+        // Sort items by ID within each section
+        sectionItems.sort((a, b) => a.id - b.id);
+
+        sectionItems.forEach((item) => {
+            const isCollected = collectedItems[item.id-1];
             const $item = $('<div>', {
-                class: 'item-entry',
+                class: `item-entry${isCollected ? ' collected' : ''}`,
                 'data-id': item.id
             });
 
-            const $circle = $('<div>', {
-                class: 'item-circle' + (collectedItems[item.id-1] ? ' collected' : '')
+            // Create sprite container and sprite
+            const $spriteContainer = $('<div>', {
+                class: 'sprite-container'
+            });
+
+            const $sprite = $('<div>', {
+                class: `sprite sprite-${item.type}`
             });
 
             const $label = $('<span>', {
-                text: `${type} #${item.id} (${item.x},${item.y})`
+                text: item.name
             });
 
-            $item.append($circle, $label);
+            $spriteContainer.append($sprite);
+            $item.append($spriteContainer, $label);
             $section.append($item);
 
             // Click handler for collecting items
             $item.on('click', () => {
                 collectedItems[item.id-1] = !collectedItems[item.id-1];
-                $circle.toggleClass('collected');
+                $item.toggleClass('collected');
                 console.log(`Item ${item.id} (${item.type}) collected:`, collectedItems[item.id-1]);
                 updateItemList();
                 createItemOverlay(); // Update markers
             });
         });
 
-        $itemsList.append($section);
+        if (sectionItems.length > 0) {
+            $itemsList.append($section);
+        }
     });
 }
 
@@ -296,10 +345,7 @@ function createItemOverlay() {
     console.log('Creating overlay, found overlay element:', $overlay.length > 0);
     $overlay.empty();
 
-    // Add a test marker to verify positioning
-    $overlay.append($('<div>', {
-        style: 'position: absolute; top: 0; left: 0; width: 20px; height: 20px; background: yellow; z-index: 100;'
-    }));
+    const markerSize = 32; // Full size now (was 16)
 
     Object.entries(items).forEach(([id, item]) => {
         if (collectedItems[id-1]) {
@@ -309,22 +355,16 @@ function createItemOverlay() {
                 'data-id': id
             }).css({
                 position: 'absolute',
-                left: `${item.x}px`,
-                top: `${item.y}px`,
-                transform: scale !== 1 ? `scale(${1/scale})` : 'none'
-            });
-
-            // Add text label for testing
-            const $label = $('<div>', {
-                text: `${item.type} #${id}`,
-                style: 'color: white; font-size: 12px; text-shadow: 1px 1px 1px black;'
+                left: `${item.x - markerSize/2}px`,  // Center horizontally
+                top: `${item.y - markerSize/2}px`,   // Center vertically
+                transform: scale !== 1 ? `scale(${Math.min(2, 1/scale)})` : 'none'  // Cap at 2x original size
             });
 
             const $sprite = $('<div>', {
                 class: `sprite sprite-${item.type}`
             });
 
-            $marker.append($sprite, $label);
+            $marker.append($sprite);
             $overlay.append($marker);
         }
     });
