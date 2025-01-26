@@ -203,50 +203,51 @@ const itemTypes = {
 };
 
 const items = {
-    1: {type: "kraid", x: 376, y: 1387, area: "kraids_lair", name: "Kraid", order100Percent: 34},
-    2: {type: "ridley", x: 861, y: 1386, area: "ridleys_lair", name: "Ridley", order100Percent: 41},
+    1: {type: "kraid", x: 1805, y: 6865, area: "kraids_lair", name: "Kraid", order100Percent: 34},
+    2: {type: "ridley", x: 4133, y: 6860, area: "ridleys_lair", name: "Ridley", order100Percent: 41},
     // Items
-    100: {type: "morph_ball", x: 75, y: 660, area: "brinstar", name: "Morph Ball", order100Percent: 2},
-    101: {type: "bombs", x: 1275, y: 208, area: "brinstar", name: "Bombs", order100Percent: 6},
-    102: {type: "hi_jump", x: 1382, y: 796, area: "norfair", name: "Hi Jump", order100Percent: 10},
-    103: {type: "varia_suit", x: 760, y: 66, area: "brinstar", name: "Varia Suit", order100Percent: 25},
-    104: {type: "screw_attack", x: 759, y: 746, area: "norfair", name: "Screw Attack", order100Percent: 19},
-    105: {type: "long_beam", x: 347, y: 211, area: "brinstar", name: "Long Beam", order100Percent: 4},
-    106: {type: "ice_beam", x: 969, y: 401, area: "brinstar", name: "Ice Beam Br", order100Percent: 43},
-    107: {type: "ice_beam", x: 1327, y: 556, area: "norfair", name: "Ice Beam No", order100Percent: 16},
-    108: {type: "wave_beam", x: 915, y: 990, area: "norfair", name: "Wave Beam", order100Percent: 23},  
+    100: {type: "morph_ball", x: 360, y: 3270, area: "brinstar", name: "Morph Ball", order100Percent: 2},
+    101: {type: "bombs", x: 6120, y: 1030, area: "brinstar", name: "Bombs", order100Percent: 6},
+    102: {type: "hi_jump", x: 6634, y: 3940, area: "norfair", name: "Hi Jump", order100Percent: 10},
+    103: {type: "varia_suit", x: 3648, y: 327, area: "brinstar", name: "Varia Suit", order100Percent: 25},
+    104: {type: "screw_attack", x: 3643, y: 3693, area: "norfair", name: "Screw Attack", order100Percent: 19},
+    105: {type: "long_beam", x: 1666, y: 1044, area: "brinstar", name: "Long Beam", order100Percent: 4},
+    106: {type: "ice_beam", x: 4651, y: 1985, area: "brinstar", name: "Ice Beam Br", order100Percent: 43},
+    107: {type: "ice_beam", x: 6370, y: 2752, area: "norfair", name: "Ice Beam No", order100Percent: 16},
+    108: {type: "wave_beam", x: 4392, y: 4901, area: "norfair", name: "Wave Beam", order100Percent: 23},
 
-    201: {type: "energy", x: 1275, y: 324, area: "brinstar", name: "Energy Tank", order100Percent: 5},
-    202: {type: "energy", x: 1316, y: 897, area: "norfair", name: "Energy Tank", order100Percent: 20},     
-    203: {type: "energy", x: 1222, y: 116, area: "brinstar", name: "Energy Tank", order100Percent: 27}, 
-    204: {type: "energy", x: 491, y: 1049, area: "kraids_lair", name: "Energy Tank", order100Percent: 32},
-    205: {type: "energy", x: 406, y: 1405, area: "norfair", name: "Energy Tank", order100Percent: 35},
-    206: {type: "energy", x: 848, y: 1190, area: "ridleys_lair", name: "Energy Tank", order100Percent: 38},
-    207: {type: "energy", x: 756, y: 1388, area: "ridleys_lair", name: "Energy Tank", order100Percent: 42},
-    208: {type: "energy", x: 419, y: 642, area: "brinstar", name: "Energy Tank", order100Percent: 44},
+    // Energy Tanks
+    201: {type: "energy", x: 6264, y: 1574, area: "brinstar", name: "Energy Tank", order100Percent: 5},
+    202: {type: "energy", x: 6317, y: 4440, area: "norfair", name: "Energy Tank", order100Percent: 20},
+    203: {type: "energy", x: 5866, y: 574, area: "brinstar", name: "Energy Tank", order100Percent: 27},
+    204: {type: "energy", x: 2357, y: 5193, area: "kraids_lair", name: "Energy Tank", order100Percent: 32},
+    205: {type: "energy", x: 1949, y: 6955, area: "norfair", name: "Energy Tank", order100Percent: 35},
+    206: {type: "energy", x: 4070, y: 5891, area: "ridleys_lair", name: "Energy Tank", order100Percent: 38},
+    207: {type: "energy", x: 3629, y: 6871, area: "ridleys_lair", name: "Energy Tank", order100Percent: 42},
+    208: {type: "energy", x: 2011, y: 3178, area: "brinstar", name: "Energy Tank", order100Percent: 44},
 
     // Missiles
-    301: {type: "missile", x: 910, y: 507, area: "brinstar", name: "Missile", order100Percent: 3},
-    302: {type: "missile", x: 902, y: 648, area: "norfair", name: "Missile", order100Percent: 8},
-    303: {type: "missile", x: 849, y: 697, area: "norfair", name: "Missile", order100Percent: 9},
-    304: {type: "missile", x: 1421, y: 509, area: "norfair", name: "Missile", order100Percent: 11},
-    305: {type: "missile", x: 1369, y: 505, area: "norfair", name: "Missile", order100Percent: 12},
-    306: {type: "missile", x: 1316, y: 502, area: "norfair", name: "Missile", order100Percent: 13},
-    307: {type: "missile", x: 1421, y: 457, area: "norfair", name: "Missile", order100Percent: 14},
-    308: {type: "missile", x: 1369, y: 460, area: "norfair", name: "Missile", order100Percent: 15},
-    309: {type: "missile", x: 1005, y: 701, area: "norfair", name: "Missile", order100Percent: 17},
-    310: {type: "missile", x: 950, y: 699, area: "norfair", name: "Missile", order100Percent: 18},
-    311: {type: "missile", x: 950, y: 1046, area: "norfair", name: "Missile", order100Percent: 21},
-    312: {type: "missile", x: 1010, y: 1045, area: "norfair", name: "Missile", order100Percent: 22},
-    313: {type: "missile", x: 1428, y: 945, area: "norfair", name: "Missile", order100Percent: 24},
-    314: {type: "missile", x: 1222, y: 116, area: "brinstar", name: "Missile", order100Percent: 26},
-    315: {type: "missile", x: 441, y: 994, area: "kraids_lair", name: "Missile", order100Percent: 29},
-    316: {type: "missile", x: 182, y: 997, area: "kraids_lair", name: "Missile", order100Percent: 30},
-    317: {type: "missile", x: 234, y: 1285, area: "kraids_lair", name: "Missile", order100Percent: 31},
-    318: {type: "missile", x: 491, y: 1185, area: "kraids_lair", name: "Missile", order100Percent: 33},
-    320: {type: "missile", x: 922, y: 1142, area: "ridleys_lair", name: "Missile", order100Percent: 37},
-    321: {type: "missile", x: 1029, y: 1436, area: "ridleys_lair", name: "Missile", order100Percent: 39},
-    322: {type: "missile", x: 1237, y: 1289, area: "ridleys_lair", name: "Missile", order100Percent: 40},
+    301: {type: "missile", x: 4368, y: 2510, area: "brinstar", name: "Missile", order100Percent: 3},
+    302: {type: "missile", x: 4330, y: 3208, area: "norfair", name: "Missile", order100Percent: 8},
+    303: {type: "missile", x: 4075, y: 3450, area: "norfair", name: "Missile", order100Percent: 9},
+    304: {type: "missile", x: 6821, y: 2520, area: "norfair", name: "Missile", order100Percent: 11},
+    305: {type: "missile", x: 6571, y: 2500, area: "norfair", name: "Missile", order100Percent: 12},
+    306: {type: "missile", x: 6317, y: 2485, area: "norfair", name: "Missile", order100Percent: 13},
+    307: {type: "missile", x: 6821, y: 2262, area: "norfair", name: "Missile", order100Percent: 14},
+    308: {type: "missile", x: 6571, y: 2277, area: "norfair", name: "Missile", order100Percent: 15},
+    309: {type: "missile", x: 4824, y: 3470, area: "norfair", name: "Missile", order100Percent: 17},
+    310: {type: "missile", x: 4560, y: 3460, area: "norfair", name: "Missile", order100Percent: 18},
+    311: {type: "missile", x: 4560, y: 5178, area: "norfair", name: "Missile", order100Percent: 21},
+    312: {type: "missile", x: 4848, y: 5173, area: "norfair", name: "Missile", order100Percent: 22},
+    313: {type: "missile", x: 6854, y: 4678, area: "norfair", name: "Missile", order100Percent: 24},
+    314: {type: "missile", x: 5866, y: 574, area: "brinstar", name: "Missile", order100Percent: 26},
+    315: {type: "missile", x: 2117, y: 4920, area: "kraids_lair", name: "Missile", order100Percent: 29},
+    316: {type: "missile", x: 874, y: 4935, area: "kraids_lair", name: "Missile", order100Percent: 30},
+    317: {type: "missile", x: 1123, y: 6361, area: "kraids_lair", name: "Missile", order100Percent: 31},
+    318: {type: "missile", x: 2357, y: 5866, area: "kraids_lair", name: "Missile", order100Percent: 33},
+    320: {type: "missile", x: 4426, y: 5653, area: "ridleys_lair", name: "Missile", order100Percent: 37},
+    321: {type: "missile", x: 4939, y: 7108, area: "ridleys_lair", name: "Missile", order100Percent: 39},
+    322: {type: "missile", x: 5938, y: 6381, area: "ridleys_lair", name: "Missile", order100Percent: 40}
 };
 
 // Collection state array
@@ -342,22 +343,55 @@ function updateItemList() {
 
 function createItemOverlay() {
     const $overlay = $('#item-overlay');
+    const $map = $('#metroid-map');
     console.log('Creating overlay, found overlay element:', $overlay.length > 0);
     $overlay.empty();
 
-    const spriteSize = 32; // Full sprite size
+    // Get both natural and displayed dimensions
+    const mapNaturalWidth = $map[0].naturalWidth;
+    const mapNaturalHeight = $map[0].naturalHeight;
+    const mapDisplayedRect = $map[0].getBoundingClientRect();
+    const containerRect = $map.parent()[0].getBoundingClientRect();
+    
+    // Calculate the actual displayed size of the map (maintaining aspect ratio)
+    const containerAspect = containerRect.width / containerRect.height;
+    const mapAspect = mapNaturalWidth / mapNaturalHeight;
+    
+    let displayWidth, displayHeight;
+    if (containerAspect > mapAspect) {
+        // Container is wider than map aspect ratio
+        displayHeight = containerRect.height;
+        displayWidth = displayHeight * mapAspect;
+    } else {
+        // Container is taller than map aspect ratio
+        displayWidth = containerRect.width;
+        displayHeight = displayWidth / mapAspect;
+    }
+    
+    // Calculate the scaling factors and offsets
+    const scaleX = displayWidth / mapNaturalWidth;
+    const scaleY = displayHeight / mapNaturalHeight;
+    
+    // Calculate centering offsets
+    const offsetX = (containerRect.width - displayWidth) / 2;
+    const offsetY = (containerRect.height - displayHeight) / 2;
 
     Object.entries(items).forEach(([id, item]) => {
         if (collectedItems[id-1]) {
-            console.log(`Creating marker for ${item.type} #${id} at ${item.x},${item.y}`);
+            // Scale the coordinates based on the map's current display size and add offsets
+            const scaledX = (item.x * scaleX) + offsetX;
+            const scaledY = (item.y * scaleY) + offsetY;
+
+            console.log(`Creating marker for ${item.type} #${id} at ${scaledX}, ${scaledY}`);
+            
             const $marker = $('<div>', {
                 class: `item-marker ${item.type}-marker`,
                 'data-id': id
             }).css({
                 position: 'absolute',
-                left: `${item.x - spriteSize}px`,  // Reduced offset
-                top: `${item.y - spriteSize}px`,   // Reduced offset
-                transform: scale !== 1 ? `scale(${Math.min(2, 1/scale)})` : 'none'  // Cap at 2x original size
+                left: `${scaledX}px`,
+                top: `${scaledY}px`,
+                transform: scale !== 1 ? `scale(${Math.min(2, 1/scale)})` : 'none'
             });
 
             const $sprite = $('<div>', {

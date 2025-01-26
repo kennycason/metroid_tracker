@@ -1,0 +1,17 @@
+# Metroid (NES) - Game Tracker
+
+This is a tool to help you track your progress in Metroid (NES). It's a work in progress and I'm not sure how useful it will be.
+
+## Usage
+
+1. Open the map in your browser.
+2. Use the slider to zoom in and out.
+3. Use the markers to track your progress.
+
+<img src="https://raw.githubusercontent.com/kennycason/metroid_tracker/main/screenshot.png" alt="Metroid Tracker Screenshot" width="500">
+
+
+## Thanks
+
+- [Numbered Map / 100% run / u/tufifdesiks](https://www.reddit.com/r/Metroid/comments/6k0z6w/metroid_numbered_map_for_100_runs_of_the_original/)
+- [Metroid Sprites](https://www.pinterest.com/pin/362258363747201127/)

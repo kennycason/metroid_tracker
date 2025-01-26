@@ -127,12 +127,15 @@ h1 {
     z-index: 11;
     width: 32px;
     height: 32px;
+    transform-origin: center;
+    margin-left: -16px;  /* Half width to center horizontally */
+    margin-top: -16px;   /* Half height to center vertically */
 }
 
 .item-marker .sprite {
     width: 32px;
     height: 32px;
-    transform-origin: center;  /* Changed from 0 0 to center */
+    transform-origin: center;
     background-image: url('metroid_sprites.jpg');
     background-repeat: no-repeat;
     image-rendering: pixelated;
