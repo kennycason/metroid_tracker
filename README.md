@@ -8,7 +8,7 @@ This is a tool to help you track your progress in Metroid (NES). It's a work in 
 2. Use the slider to zoom in and out.
 3. Use the markers to track your progress.
 
-<img src="https://raw.githubusercontent.com/kennycason/metroid_tracker/main/screenshot.png" alt="Metroid Tracker Screenshot" width="500">
+<img src="https://raw.githubusercontent.com/kennycason/metroid_tracker/main/screenshot.png" alt="Metroid Tracker Screenshot" width="100%">
 
 
 ## Thanks
