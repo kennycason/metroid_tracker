@@ -345,7 +345,7 @@ function createItemOverlay() {
     console.log('Creating overlay, found overlay element:', $overlay.length > 0);
     $overlay.empty();
 
-    const markerSize = 32; // Full size now (was 16)
+    const spriteSize = 32; // Full sprite size
 
     Object.entries(items).forEach(([id, item]) => {
         if (collectedItems[id-1]) {
@@ -355,8 +355,8 @@ function createItemOverlay() {
                 'data-id': id
             }).css({
                 position: 'absolute',
-                left: `${item.x - markerSize/2}px`,  // Center horizontally
-                top: `${item.y - markerSize/2}px`,   // Center vertically
+                left: `${item.x - spriteSize}px`,  // Reduced offset
+                top: `${item.y - spriteSize}px`,   // Reduced offset
                 transform: scale !== 1 ? `scale(${Math.min(2, 1/scale)})` : 'none'  // Cap at 2x original size
             });
 

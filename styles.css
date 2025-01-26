@@ -125,14 +125,14 @@ h1 {
     position: absolute;
     pointer-events: none;
     z-index: 11;
-    width: 32px;  /* Doubled from 16px */
-    height: 32px;  /* Doubled from 16px */
+    width: 32px;
+    height: 32px;
 }
 
 .item-marker .sprite {
     width: 32px;
     height: 32px;
-    transform-origin: 0 0;
+    transform-origin: center;  /* Changed from 0 0 to center */
     background-image: url('metroid_sprites.jpg');
     background-repeat: no-repeat;
     image-rendering: pixelated;
