@@ -1,6 +1,6 @@
 # Metroid (NES) - Game Tracker
 
-This is a tool to help you track your progress in Metroid (NES). It's a work in progress and I'm not sure how useful it will be.
+This is a tool to help you track your progress in Metroid (NES). It's a work in progress and I'm not sure how useful it will be. Experiment using Cursor + Claude.
 
 ## Usage
 
