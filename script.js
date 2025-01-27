@@ -4,6 +4,9 @@ let scale = 1;
 let offsetX = 0;
 let offsetY = 0;
 
+// Add view state variable
+let currentView = 'type';
+
 // Initialize the tracker
 $(document).ready(() => {
     updateCounters();
@@ -22,6 +25,15 @@ $(document).ready(() => {
     // Add non-passive wheel event listener
     const mapContainer = document.querySelector('.map-container');
     mapContainer.addEventListener('wheel', handleWheel, { passive: false });
+
+    // Add view toggle handler
+    $('.toggle-btn').on('click', function() {
+        const view = $(this).data('view');
+        $('.toggle-btn').removeClass('active');
+        $(this).addClass('active');
+        currentView = view;
+        updateItemList();
+    });
 });
 
 function updateCounters() {
@@ -239,16 +251,50 @@ const collectedItems = new Array(Object.keys(items).length).fill(false);
 // Update HTML to show items in left panel
 function updateItemList() {
     const $itemsList = $('.items-list');
-    $itemsList.empty(); // Clear existing content
+    $itemsList.empty();
     
-    // Group items by type
-    const itemsByType = {};
-    Object.entries(items).forEach(([id, item]) => {
-        if (!itemsByType[item.type]) {
-            itemsByType[item.type] = [];
-        }
-        itemsByType[item.type].push({id, ...item});
-    });
+    if (currentView === 'type') {
+        // Original type-based view
+        const itemsByType = {};
+        Object.entries(items).forEach(([id, item]) => {
+            if (!itemsByType[item.type]) {
+                itemsByType[item.type] = [];
+            }
+            itemsByType[item.type].push({id, ...item});
+        });
+
+        // Create sections in the specified order
+        sectionOrder.forEach((section) => {
+            const $section = $('<div>', {
+                class: 'item-section'
+            });
+            
+            $section.append($('<h3>', {
+                text: section.charAt(0).toUpperCase() + section.slice(1)
+            }));
+
+            const sectionItems = [];
+            itemTypes[section].forEach(type => {
+                if (itemsByType[type]) {
+                    sectionItems.push(...itemsByType[type]);
+                }
+            });
+
+            sectionItems.sort((a, b) => a.id - b.id);
+            appendItems($section, sectionItems);
+
+            if (sectionItems.length > 0) {
+                $itemsList.append($section);
+            }
+        });
+    } else {
+        // 100% completion order view
+        const allItems = Object.entries(items)
+            .map(([id, item]) => ({id, ...item}))
+            .sort((a, b) => a.order100Percent - b.order100Percent);
+
+        appendItems($itemsList, allItems);
+    }
 
     // Update counters
     const energyCount = collectedItems.filter((collected, index) => 
@@ -258,69 +304,43 @@ function updateItemList() {
     const missileContainers = collectedItems.filter((collected, index) => 
         collected && items[index + 1]?.type === 'missile'
     ).length;
-    const missileCount = missileContainers * 5; // Each container gives 5 missiles
+    const missileCount = missileContainers * 5;
 
     $('#energy-count').text(energyCount);
     $('#missile-count').text(missileCount);
+}
 
-    // Create sections in the specified order
-    sectionOrder.forEach((section) => {
-        const $section = $('<div>', {
-            class: 'item-section'
-        });
-        
-        $section.append($('<h3>', {
-            text: section.charAt(0).toUpperCase() + section.slice(1)
-        }));
-
-        // Get all items that belong to this section's types
-        const sectionItems = [];
-        itemTypes[section].forEach(type => {
-            if (itemsByType[type]) {
-                sectionItems.push(...itemsByType[type]);
-            }
+function appendItems($container, items) {
+    items.forEach((item) => {
+        const isCollected = collectedItems[item.id-1];
+        const $item = $('<div>', {
+            class: `item-entry${isCollected ? ' collected' : ''}`,
+            'data-id': item.id
         });
 
-        // Sort items by ID within each section
-        sectionItems.sort((a, b) => a.id - b.id);
-
-        sectionItems.forEach((item) => {
-            const isCollected = collectedItems[item.id-1];
-            const $item = $('<div>', {
-                class: `item-entry${isCollected ? ' collected' : ''}`,
-                'data-id': item.id
-            });
-
-            // Create sprite container and sprite
-            const $spriteContainer = $('<div>', {
-                class: 'sprite-container'
-            });
-
-            const $sprite = $('<div>', {
-                class: `sprite sprite-${item.type}`
-            });
-
-            const $label = $('<span>', {
-                text: item.name
-            });
-
-            $spriteContainer.append($sprite);
-            $item.append($spriteContainer, $label);
-            $section.append($item);
-
-            // Click handler for collecting items
-            $item.on('click', () => {
-                collectedItems[item.id-1] = !collectedItems[item.id-1];
-                $item.toggleClass('collected');
-                console.log(`Item ${item.id} (${item.type}) collected:`, collectedItems[item.id-1]);
-                updateItemList();
-                createItemOverlay(); // Update markers
-            });
+        const $spriteContainer = $('<div>', {
+            class: 'sprite-container'
         });
 
-        if (sectionItems.length > 0) {
-            $itemsList.append($section);
-        }
+        const $sprite = $('<div>', {
+            class: `sprite sprite-${item.type}`
+        });
+
+        const $label = $('<span>', {
+            text: item.name
+        });
+
+        $spriteContainer.append($sprite);
+        $item.append($spriteContainer, $label);
+        $container.append($item);
+
+        $item.on('click', () => {
+            collectedItems[item.id-1] = !collectedItems[item.id-1];
+            $item.toggleClass('collected');
+            console.log(`Item ${item.id} (${item.type}) collected:`, collectedItems[item.id-1]);
+            updateItemList();
+            createItemOverlay();
+        });
     });
 }
 

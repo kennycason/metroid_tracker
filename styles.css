@@ -62,7 +62,7 @@ h1 {
 
 .stats-panel {
     background-color: var(--panel-bg);
-    padding: 20px;
+    padding: 10px;
     min-width: 125px; 
     max-width: 125px; 
     display: flex;
@@ -71,6 +71,7 @@ h1 {
 }
 
 .stats-header {
+    margin-top: 0;
     margin-bottom: 10px; 
     padding-bottom: 10px; 
     border-bottom: 1px solid var(--accent-color);
@@ -330,4 +331,33 @@ h1 {
     width: 42px;  /* Reduced from 48px */
     height: 42px;  /* Reduced from 48px */
     transform: scale(1.1);  /* Reduced from 1.2 */
+}
+
+.view-toggle {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 10px;
+    padding: 0 2px;
+}
+
+.toggle-btn {
+    flex: 1;
+    background: transparent;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    padding: 4px 8px;
+    font-family: 'MetroidFont', 'Arial', sans-serif;
+    font-size: 0.8em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.toggle-btn:hover {
+    background: var(--accent-color);
+    color: var(--background-color);
+}
+
+.toggle-btn.active {
+    background: var(--accent-color);
+    color: var(--background-color);
 }
