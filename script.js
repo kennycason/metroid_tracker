@@ -10,6 +10,18 @@ let currentView = 'type';
 // Add at the top with other global variables
 let currentNextItem = null;
 
+// Add at the top with other global variables
+const itemShortCodes = {
+    'maru_mari': 'mm',
+    'varia_suit': 'vs',
+    'hi_jump': 'hj',
+    'wave_beam': 'wb',
+    'ice_beam': 'ib',
+    'screw_attack': 'sa',
+    'long_beam': 'lb',
+    'bombs': 'b'
+};
+
 // Initialize the tracker
 $(document).ready(() => {
     updateCounters();
@@ -65,6 +77,22 @@ $(document).ready(() => {
         updateItemList();
         createItemOverlay();
     });
+
+    // Add share button handler
+    $('.share-btn').on('click', () => {
+        const shareUrl = generateShareUrl();
+        navigator.clipboard.writeText(shareUrl).then(() => {
+            alert('Share URL copied to clipboard!');
+        }).catch(err => {
+            console.error('Failed to copy URL:', err);
+            prompt('Copy this share URL:', shareUrl);
+        });
+    });
+
+    // Load state from URL if parameters exist
+    if (window.location.search) {
+        loadStateFromUrl();
+    }
 });
 
 function updateCounters() {
@@ -566,4 +594,87 @@ function handleWheel(e) {
     offsetY += mouseY - (pointY * scale);
 
     applyTransformWithConstraints();
+}
+
+// Add after document ready
+function generateShareUrl() {
+    const collectedState = {
+        items: {},
+        missiles: [],
+        energy: []
+    };
+
+    // Collect state
+    Object.entries(items).forEach(([id, item]) => {
+        if (collectedItems[id-1]) {
+            if (item.type === 'missile') {
+                collectedState.missiles.push(parseInt(id) - 300);
+            } else if (item.type === 'energy') {
+                collectedState.energy.push(parseInt(id) - 200);
+            } else if (itemShortCodes[item.type]) {
+                collectedState.items[itemShortCodes[item.type]] = 1;
+            }
+        }
+    });
+
+    // Build URL parts manually to avoid escaping
+    let urlParts = [];
+    
+    // Add items
+    Object.entries(collectedState.items).forEach(([code, value]) => {
+        urlParts.push(`${code}=${value}`);
+    });
+
+    // Add missiles and energy if any collected
+    if (collectedState.missiles.length > 0) {
+        urlParts.push(`m=${collectedState.missiles.join(',')}`);
+    }
+    if (collectedState.energy.length > 0) {
+        urlParts.push(`e=${collectedState.energy.join(',')}`);
+    }
+
+    return `${window.location.origin}${window.location.pathname}?${urlParts.join('&')}`;
+}
+
+function loadStateFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    
+    // Reset collection state
+    collectedItems.fill(false);
+
+    // Load items
+    Object.entries(itemShortCodes).forEach(([type, code]) => {
+        if (params.has(code)) {
+            // Find and collect the item
+            Object.entries(items).forEach(([id, item]) => {
+                if (item.type === type) {
+                    collectedItems[id-1] = true;
+                }
+            });
+        }
+    });
+
+    // Load missiles
+    if (params.has('m')) {
+        params.get('m').split(',').forEach(num => {
+            const id = 300 + parseInt(num);
+            if (items[id]) {
+                collectedItems[id-1] = true;
+            }
+        });
+    }
+
+    // Load energy tanks
+    if (params.has('e')) {
+        params.get('e').split(',').forEach(num => {
+            const id = 200 + parseInt(num);
+            if (items[id]) {
+                collectedItems[id-1] = true;
+            }
+        });
+    }
+
+    // Update display
+    updateItemList();
+    createItemOverlay();
 } 

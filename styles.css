@@ -63,8 +63,8 @@ h1 {
 .stats-panel {
     background-color: var(--panel-bg);
     padding: 10px;
-    min-width: 125px; 
-    max-width: 125px; 
+    min-width: 145px; /* Increased from 125px to account for padding */
+    max-width: 145px; /* Increased from 125px to account for padding */
     display: flex;
     flex-direction: column;
     border-right: 1px solid var(--accent-color);
@@ -338,6 +338,33 @@ h1 {
     gap: 4px;
     margin-bottom: 10px;
     padding: 0 2px;
+    align-items: center;
+}
+
+.share-btn {
+    width: 32px;
+    height: 24px; /* Reduced from 28px to match other buttons better */
+    padding: 4px;
+    margin-right: 4px;
+    background: transparent;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.share-btn:hover {
+    background: var(--accent-color);
+    color: var(--background-color);
+}
+
+.share-btn svg {
+    width: 12px; /* Reduced from 14px to fit better in shorter button */
+    height: 12px;
+    fill: currentColor;
 }
 
 .toggle-btn {
