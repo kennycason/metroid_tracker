@@ -7,6 +7,9 @@ let offsetY = 0;
 // Add view state variable
 let currentView = 'type';
 
+// Add at the top with other global variables
+let currentNextItem = null;
+
 // Initialize the tracker
 $(document).ready(() => {
     updateCounters();
@@ -338,6 +341,26 @@ function appendItems($container, items) {
             collectedItems[item.id-1] = !collectedItems[item.id-1];
             $item.toggleClass('collected');
             console.log(`Item ${item.id} (${item.type}) collected:`, collectedItems[item.id-1]);
+            
+            // Find next uncollected item in the current view's order
+            if (currentView == '100') {
+                console.log('Current view is 100%');
+                const currentOrder = item.order100Percent;
+                const sortedItems = Object.entries(items)
+                    .map(([id, item]) => ({id: parseInt(id), ...item}))
+                    .sort((a, b) => a.order100Percent - b.order100Percent);
+                currentNextItem = sortedItems.find(item => !collectedItems[item.id-1] && item.order100Percent > currentOrder);
+                if (currentNextItem) {
+                    console.log('Next item to collect:', currentNextItem.name);
+                } else {
+                    console.log('No more items to collect in 100% view');
+                    currentNextItem = null;
+                }
+            } else {
+                console.log('Current view is type');
+                currentNextItem = null;
+            }
+            
             updateItemList();
             createItemOverlay();
         });
@@ -347,78 +370,47 @@ function appendItems($container, items) {
 function createItemOverlay() {
     const $overlay = $('#item-overlay');
     const $map = $('#metroid-map');
-    const $container = $('.map-container');
     
     $overlay.empty();
+    console.log('Current view:', currentView);
 
-    // Get all relevant dimensions
-    const mapNaturalWidth = $map[0].naturalWidth;
-    const mapNaturalHeight = $map[0].naturalHeight;
-    const containerRect = $container[0].getBoundingClientRect();
+    // Get basic scaling factors
+    const scaleX = $map.width() / $map[0].naturalWidth;
+    const scaleY = $map.height() / $map[0].naturalHeight;
 
-    // Calculate the displayed dimensions while maintaining aspect ratio
-    const containerAspect = containerRect.width / containerRect.height;
-    const mapAspect = mapNaturalWidth / mapNaturalHeight;
-
-    let displayWidth, displayHeight;
-    if (containerAspect > mapAspect) {
-        // Height is the limiting factor
-        displayHeight = containerRect.height;
-        displayWidth = displayHeight * mapAspect;
-    } else {
-        // Width is the limiting factor
-        displayWidth = containerRect.width;
-        displayHeight = displayWidth / mapAspect;
-    }
-
-    // Calculate scaling based on the displayed dimensions
-    const scaleX = displayWidth / mapNaturalWidth;
-    const scaleY = displayHeight / mapNaturalHeight;
-
-    // Position the overlay to match the map's dimensions
-    // Align to top-left corner, just like the map
-    $overlay.css({
-        position: 'absolute',
-        width: `${displayWidth}px`,
-        height: `${displayHeight}px`,
-        left: '0',
-        top: '0',
-        'transform-origin': '0 0'
-    });
-
+    // Create markers for collected items and next item
     Object.entries(items).forEach(([id, item]) => {
-        if (collectedItems[id-1]) {
-            const scaledX = item.x * scaleX;
-            const scaledY = item.y * scaleY;
-            
+        const isCollected = collectedItems[id-1];
+        const isNextItem = currentView == '100' && currentNextItem && id == currentNextItem.id;
+
+        // Show marker if item is collected OR if it's the next item in 100% view
+        if (isCollected || isNextItem) {
             const $marker = $('<div>', {
                 class: `item-marker ${item.type}-marker`,
                 'data-id': id
             }).css({
                 position: 'absolute',
-                left: `${scaledX}px`,
-                top: `${scaledY}px`,
+                left: `${item.x * scaleX}px`,
+                top: `${item.y * scaleY}px`,
                 transform: `scale(${Math.min(2, 1/scale)})`,
                 'transform-origin': '0 0'
             });
 
             const $sprite = $('<div>', {
-                class: `sprite sprite-${item.type}`
+                class: `sprite sprite-${item.type}${isNextItem ? ' next-item' : ''}`
             });
+
+            if (isNextItem) {
+                console.log('Creating highlighted marker for next item:', item.name);
+            }
 
             $marker.append($sprite);
             $overlay.append($marker);
         }
     });
 
-    // Apply the same transform as the map
+    // Apply map transform
     $overlay.css('transform', $map.css('transform'));
-
-    // Debug output
-    console.log(`=== Dimensions ===`);
-    console.log(`Container: ${containerRect.width}x${containerRect.height}`);
-    console.log(`Display: ${displayWidth}x${displayHeight}`);
-    console.log(`Scale: ${scaleX.toFixed(4)}x${scaleY.toFixed(4)}`);
 }
 
 // Sort and check items

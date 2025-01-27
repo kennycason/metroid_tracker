@@ -361,3 +361,10 @@ h1 {
     background: var(--accent-color);
     color: var(--background-color);
 }
+
+.sprite.next-item {
+    filter: brightness(300%) !important;
+    box-shadow: 0 0 15px var(--accent-color), 0 0 30px var(--accent-color);
+    border: 2px solid var(--accent-color);
+    border-radius: 50%;
+}
