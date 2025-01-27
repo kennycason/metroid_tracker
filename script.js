@@ -32,7 +32,7 @@ const tracks = [
     { title: "Kraid's Lair", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/5%20-%20Kraid%27s%20Lair.mp3" },
     { title: "Ridley's Lair", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/6%20-%20Ridley%27s%20Lair.mp3" },
     { title: "Chozos", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/7%20-%20Chozos.mp3" },
-    { title: "Power Up", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/8%20-%20Power%20Up.mp3" },
+    // { title: "Power Up", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/8%20-%20Power%20Up.mp3" },
     { title: "Tourian", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/9%20-%20Tourian.mp3" },
     { title: "Mother Brain", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/10%20-%20Mother%20Brain.mp3" },
     { title: "Quick Escape", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/11%20-%20Quick%20Escape.mp3" },

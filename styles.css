@@ -61,13 +61,13 @@ h1 {
 }
 
 .stats-panel {
-    width: 180px;  /* Reduced from 240px */
+    width: 125px;  /* Reduced from 145px */
     background: var(--background-color);
     border-right: 1px solid var(--accent-color);
-    padding: 10px;
+    padding: 6px;  /* Reduced from 8px */
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
     height: 100%;
     overflow-y: auto;
 }
@@ -252,10 +252,10 @@ h1 {
 .item-entry {
     display: flex;
     align-items: center;
-    gap: 6px;
-    margin-bottom: 2px;
+    gap: 4px;  /* Reduced from 6px */
+    padding: 4px;  /* Reduced from 5px */
+    margin-bottom: 2px;  /* Reduced from 3px */
     cursor: pointer;
-    padding: 3px;
     font-size: 0.85em;
     white-space: nowrap;
 }
@@ -341,9 +341,9 @@ h1 {
     align-items: center;
 }
 
-.share-btn, .volume-btn, .loop-btn {
-    width: 32px;
-    height: 32px;
+.share-btn {
+    width: 28px;  /* Reduced from 32px */
+    height: 28px;
     padding: 4px;
     background: transparent;
     border: 1px solid var(--accent-color);
@@ -361,19 +361,19 @@ h1 {
     color: var(--background-color);
 }
 
-.share-btn svg, .volume-btn svg, .loop-btn svg {
-    width: 16px;
+.share-btn svg {
+    width: 16px;  /* Reduced from 18px */
     height: 16px;
     fill: currentColor;
 }
 
 .toggle-btn {
     flex: 1;
-    height: 32px;
+    height: 28px;  /* Reduced from 32px */
     background: transparent;
     border: 1px solid var(--accent-color);
     color: var(--accent-color);
-    padding: 4px 8px;
+    padding: 2px 4px;  /* Reduced from 4px 6px */
     font-family: 'MetroidFont', 'Arial', sans-serif;
     font-size: 0.9em;
     cursor: pointer;
