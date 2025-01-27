@@ -10,6 +10,12 @@ $(document).ready(() => {
     updateItemList();
     initializeMapZoom();
     createItemOverlay(); // Initial creation of markers
+
+    // Update during resize, not just after
+    $(window).on('resize', () => {
+        createItemOverlay();
+        applyTransformWithConstraints();
+    });
 });
 
 function updateCounters() {
@@ -146,42 +152,45 @@ function initializeMapZoom() {
 
         applyTransformWithConstraints();
     });
+}
 
-    function applyTransformWithConstraints() {
-        const rect = $mapContainer[0].getBoundingClientRect();
-        const mapRect = $map[0].getBoundingClientRect();
+// Move applyTransformWithConstraints to global scope
+function applyTransformWithConstraints() {
+    const $map = $('#metroid-map');
+    const $mapContainer = $('.map-container');
+    const rect = $mapContainer[0].getBoundingClientRect();
+    const mapRect = $map[0].getBoundingClientRect();
 
-        // Calculate boundaries
-        const minX = rect.width - mapRect.width * scale;
-        const minY = rect.height - mapRect.height * scale;
+    // Calculate boundaries
+    const minX = rect.width - mapRect.width * scale;
+    const minY = rect.height - mapRect.height * scale;
 
-        // Constrain offsets
-        offsetX = Math.min(0, Math.max(minX, offsetX));
-        offsetY = Math.min(0, Math.max(minY, offsetY));
+    // Constrain offsets
+    offsetX = Math.min(0, Math.max(minX, offsetX));
+    offsetY = Math.min(0, Math.max(minY, offsetY));
 
-        // If scale is 1 or less, reset position to top-left
-        if (scale <= 1) {
-            offsetX = 0;
-            offsetY = 0;
-        }
-
-        $map.css({
-            'transform-origin': '0 0',
-            'transform': `translate(${offsetX}px, ${offsetY}px) scale(${scale})`,
-            'transition': 'transform 0.1s ease-out'
-        });
-
-        // Update overlay position to match map
-        $('#item-overlay').css({
-            'transform-origin': '0 0',
-            'transform': `translate(${offsetX}px, ${offsetY}px) scale(${scale})`
-        });
-
-        // Update individual markers to counter the map scale, but cap at 2x original size
-        $('.item-marker').css({
-            transform: `scale(${Math.min(2, 1/scale)})`
-        });
+    // If scale is 1 or less, reset position to top-left
+    if (scale <= 1) {
+        offsetX = 0;
+        offsetY = 0;
     }
+
+    $map.css({
+        'transform-origin': '0 0',
+        'transform': `translate(${offsetX}px, ${offsetY}px) scale(${scale})`,
+        'transition': 'transform 0.1s ease-out'
+    });
+
+    // Update overlay position to match map
+    $('#item-overlay').css({
+        'transform-origin': '0 0',
+        'transform': `translate(${offsetX}px, ${offsetY}px) scale(${scale})`
+    });
+
+    // Update individual markers to counter the map scale, but cap at 2x original size
+    $('.item-marker').css({
+        transform: `scale(${Math.min(2, 1/scale)})`
+    });
 }
 
 // Group types for section ordering
@@ -344,45 +353,51 @@ function updateItemList() {
 function createItemOverlay() {
     const $overlay = $('#item-overlay');
     const $map = $('#metroid-map');
-    console.log('Creating overlay, found overlay element:', $overlay.length > 0);
+    const $container = $('.map-container');
+    
     $overlay.empty();
 
-    // Get both natural and displayed dimensions
+    // Get all relevant dimensions
     const mapNaturalWidth = $map[0].naturalWidth;
     const mapNaturalHeight = $map[0].naturalHeight;
-    const mapDisplayedRect = $map[0].getBoundingClientRect();
-    const containerRect = $map.parent()[0].getBoundingClientRect();
-    
-    // Calculate the actual displayed size of the map (maintaining aspect ratio)
+    const containerRect = $container[0].getBoundingClientRect();
+
+    // Calculate the displayed dimensions while maintaining aspect ratio
     const containerAspect = containerRect.width / containerRect.height;
     const mapAspect = mapNaturalWidth / mapNaturalHeight;
-    
+
     let displayWidth, displayHeight;
     if (containerAspect > mapAspect) {
-        // Container is wider than map aspect ratio
+        // Height is the limiting factor
         displayHeight = containerRect.height;
         displayWidth = displayHeight * mapAspect;
     } else {
-        // Container is taller than map aspect ratio
+        // Width is the limiting factor
         displayWidth = containerRect.width;
         displayHeight = displayWidth / mapAspect;
     }
-    
-    // Calculate the scaling factors and offsets
+
+    // Calculate scaling based on the displayed dimensions
     const scaleX = displayWidth / mapNaturalWidth;
     const scaleY = displayHeight / mapNaturalHeight;
+
+    // Position the overlay to match the map's dimensions
+    // Only apply horizontal centering, align to top vertically
+    const offsetX = Math.max((containerRect.width - displayWidth) / 2, 0);
     
-    // Calculate centering offsets
-    const offsetX = (containerRect.width - displayWidth) / 2;
-    const offsetY = (containerRect.height - displayHeight) / 2;
+    $overlay.css({
+        position: 'absolute',
+        width: `${displayWidth}px`,
+        height: `${displayHeight}px`,
+        left: `${offsetX}px`,
+        top: '0',
+        'transform-origin': '0 0'
+    });
 
     Object.entries(items).forEach(([id, item]) => {
         if (collectedItems[id-1]) {
-            // Scale the coordinates based on the map's current display size and add offsets
-            const scaledX = (item.x * scaleX) + offsetX;
-            const scaledY = (item.y * scaleY) + offsetY;
-
-            console.log(`Creating marker for ${item.type} #${id} at ${scaledX}, ${scaledY}`);
+            const scaledX = item.x * scaleX;
+            const scaledY = item.y * scaleY;
             
             const $marker = $('<div>', {
                 class: `item-marker ${item.type}-marker`,
@@ -391,7 +406,8 @@ function createItemOverlay() {
                 position: 'absolute',
                 left: `${scaledX}px`,
                 top: `${scaledY}px`,
-                transform: scale !== 1 ? `scale(${Math.min(2, 1/scale)})` : 'none'
+                transform: `scale(${Math.min(2, 1/scale)})`,
+                'transform-origin': '0 0'
             });
 
             const $sprite = $('<div>', {
@@ -402,8 +418,16 @@ function createItemOverlay() {
             $overlay.append($marker);
         }
     });
-    
-    console.log('Total markers created:', $overlay.children().length);
+
+    // Apply the same transform as the map
+    $overlay.css('transform', $map.css('transform'));
+
+    // Debug output
+    console.log(`=== Dimensions ===`);
+    console.log(`Container: ${containerRect.width}x${containerRect.height}`);
+    console.log(`Display: ${displayWidth}x${displayHeight}`);
+    console.log(`Scale: ${scaleX.toFixed(4)}x${scaleY.toFixed(4)}`);
+    console.log(`Offset X: ${offsetX}`);
 }
 
 // Sort and check items
