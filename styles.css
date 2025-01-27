@@ -61,13 +61,15 @@ h1 {
 }
 
 .stats-panel {
-    background-color: var(--panel-bg);
+    width: 180px;  /* Reduced from 240px */
+    background: var(--background-color);
+    border-right: 1px solid var(--accent-color);
     padding: 10px;
-    min-width: 145px; /* Increased from 125px to account for padding */
-    max-width: 145px; /* Increased from 125px to account for padding */
     display: flex;
     flex-direction: column;
-    border-right: 1px solid var(--accent-color);
+    gap: 10px;
+    height: 100%;
+    overflow-y: auto;
 }
 
 .stats-header {
@@ -336,16 +338,13 @@ h1 {
 .view-toggle {
     display: flex;
     gap: 4px;
-    margin-bottom: 10px;
-    padding: 0 2px;
     align-items: center;
 }
 
-.share-btn {
+.share-btn, .volume-btn, .loop-btn {
     width: 32px;
-    height: 25px; /* Increased from 24px by 1px */
+    height: 32px;
     padding: 4px;
-    margin-right: 4px;
     background: transparent;
     border: 1px solid var(--accent-color);
     color: var(--accent-color);
@@ -356,25 +355,27 @@ h1 {
     justify-content: center;
 }
 
-.share-btn:hover {
+.share-btn:hover, .volume-btn:hover, .loop-btn:hover,
+.share-btn.active, .volume-btn.active, .loop-btn.active {
     background: var(--accent-color);
     color: var(--background-color);
 }
 
-.share-btn svg {
-    width: 12px; /* Reduced from 14px to fit better in shorter button */
-    height: 12px;
+.share-btn svg, .volume-btn svg, .loop-btn svg {
+    width: 16px;
+    height: 16px;
     fill: currentColor;
 }
 
 .toggle-btn {
     flex: 1;
+    height: 32px;
     background: transparent;
     border: 1px solid var(--accent-color);
     color: var(--accent-color);
     padding: 4px 8px;
     font-family: 'MetroidFont', 'Arial', sans-serif;
-    font-size: 0.8em;
+    font-size: 0.9em;
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -389,9 +390,99 @@ h1 {
     color: var(--background-color);
 }
 
-.sprite.next-item {
-    filter: brightness(300%) !important;
-    box-shadow: 0 0 15px var(--accent-color), 0 0 30px var(--accent-color);
-    border: 2px solid var(--accent-color);
-    border-radius: 50%;
+.audio-controls {
+    position: absolute;
+    left: 5px;
+    top: 5px;
+    z-index: 100;
+}
+
+.volume-btn.standalone {
+    display: block;
+}
+
+.retro-player {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 0;
+    flex-direction: column;
+    gap: 3px;
+    background: #222;
+    border: 1px solid var(--accent-color);
+    border-radius: 4px;
+    padding: 3px;
+}
+
+.retro-player.visible {
+    display: flex;
+}
+
+.player-row {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+}
+
+.audio-btn, .volume-btn {
+    width: 18px;
+    height: 18px;
+    padding: 2px;
+    background: transparent;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.audio-btn:hover, .audio-btn.active,
+.volume-btn:hover, .volume-btn.active {
+    background: var(--accent-color);
+    color: var(--background-color);
+}
+
+.audio-btn svg, .volume-btn svg {
+    width: 11px;
+    height: 11px;
+    fill: currentColor;
+}
+
+.track-display {
+    background: #143;
+    border: 1px solid var(--accent-color);
+    height: 16px;
+    overflow: hidden;
+    position: relative;
+    width: 135px;
+}
+
+.track-scroller {
+    position: absolute;
+    white-space: nowrap;
+    will-change: transform;
+    font-family: 'MetroidFont', 'Arial', sans-serif;
+    color: var(--accent-color);
+    font-size: 0.7em;
+    line-height: 16px;
+    padding: 0 6px;
+}
+
+@keyframes scroll {
+    0% {
+        transform: translateX(135px);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+.retro-player .volume-btn {
+    display: flex;
+}
+
+.retro-player.visible + .volume-btn.standalone {
+    display: none;
 }

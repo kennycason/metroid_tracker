@@ -23,6 +23,28 @@ const itemShortCodes = {
     'ridley': 'r'
 };
 
+// Add at the top with other global variables
+const tracks = [
+    { title: "Intro", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/1%20-%20Intro.mp3" },
+    { title: "Enter: Samus", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/2%20-%20Enter%20%20Samus.mp3" },
+    { title: "Brinstar", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/3%20-%20Brinstar.mp3" },
+    { title: "Norfair", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/4%20-%20Norfair.mp3" },
+    { title: "Kraid's Lair", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/5%20-%20Kraid%27s%20Lair.mp3" },
+    { title: "Ridley's Lair", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/6%20-%20Ridley%27s%20Lair.mp3" },
+    { title: "Chozos", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/7%20-%20Chozos.mp3" },
+    { title: "Power Up", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/8%20-%20Power%20Up.mp3" },
+    { title: "Tourian", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/9%20-%20Tourian.mp3" },
+    { title: "Mother Brain", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/10%20-%20Mother%20Brain.mp3" },
+    { title: "Quick Escape", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/11%20-%20Quick%20Escape.mp3" },
+    { title: "Mission Completed Successfully", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/12%20-%20Mission%20Completed%20Successfully.mp3" }
+];
+
+let currentTrack = 0;
+let audio = null;
+let isPlaying = false;
+let isLooping = false;
+let isMuted = true;
+
 // Initialize the tracker
 $(document).ready(() => {
     updateCounters();
@@ -94,6 +116,33 @@ $(document).ready(() => {
     if (window.location.search) {
         loadStateFromUrl();
     }
+
+    // Initialize audio
+    audio = new Audio();
+    audio.src = tracks[0].url; // Set initial track
+    updateTrackDisplay(); // Show initial track title
+    
+    audio.addEventListener('ended', () => {
+        if (isLooping) {
+            audio.currentTime = 0;
+            audio.play().catch(err => {
+                console.error('Failed to play audio:', err);
+            });
+        } else {
+            nextTrack();
+        }
+    });
+
+    // Add audio control handlers
+    $('.audio-btn#playPause').on('click', togglePlay);
+    $('.audio-btn#prevTrack').on('click', prevTrack);
+    $('.audio-btn#nextTrack').on('click', nextTrack);
+    $('.audio-btn#loopTrack').on('click', toggleLoop);
+    $('.volume-btn').on('click', toggleVolume);
+
+    // Initialize volume state
+    $('.retro-player').removeClass('visible');
+    updateVolumeIcon(true); // Start muted
 });
 
 function updateCounters() {
@@ -695,4 +744,109 @@ function loadStateFromUrl() {
     // Update display
     updateItemList();
     createItemOverlay();
+}
+
+function updateTrackDisplay() {
+    const $title = $('#trackTitle');
+    const title = tracks[currentTrack].title;
+    $title.text(title);
+    
+    // Remove any existing animation
+    $title.css('animation', 'none');
+    
+    // Force reflow
+    void $title[0].offsetWidth;
+    
+    // Calculate animation duration based on text length
+    const duration = Math.max(5, title.length * 0.3);
+    
+    // Add animation if text is too long
+    if ($title.width() > $('.track-display').width()) {
+        $title.css('animation', `scroll ${duration}s linear infinite`);
+    }
+}
+
+function togglePlay() {
+    if (!audio.src) {
+        audio.src = tracks[currentTrack].url;
+        updateTrackDisplay();
+    }
+
+    if (isPlaying) {
+        audio.pause();
+        isPlaying = false;
+        $('#playPause').removeClass('active');
+        $('#playPause').find('svg path').attr('d', 'M8 5v14l11-7z');
+        // Pause the scrolling
+        $('#trackTitle').css('animation-play-state', 'paused');
+    } else {
+        audio.play().catch(err => {
+            console.error('Failed to play audio:', err);
+        });
+        isPlaying = true;
+        $('#playPause').addClass('active');
+        $('#playPause').find('svg path').attr('d', 'M6 19h4V5H6v14zm8-14v14h4V5h-4z');
+        // Resume the scrolling
+        $('#trackTitle').css('animation-play-state', 'running');
+    }
+}
+
+function prevTrack() {
+    currentTrack = (currentTrack - 1 + tracks.length) % tracks.length;
+    if (isPlaying) {
+        audio.src = tracks[currentTrack].url;
+        audio.play().catch(err => {
+            console.error('Failed to play audio:', err);
+        });
+    } else {
+        audio.src = tracks[currentTrack].url;
+    }
+    updateTrackDisplay();
+}
+
+function nextTrack() {
+    currentTrack = (currentTrack + 1) % tracks.length;
+    if (isPlaying) {
+        audio.src = tracks[currentTrack].url;
+        audio.play().catch(err => {
+            console.error('Failed to play audio:', err);
+        });
+    } else {
+        audio.src = tracks[currentTrack].url;
+    }
+    updateTrackDisplay();
+}
+
+function toggleLoop() {
+    isLooping = !isLooping;
+    const $loopBtn = $('#loopTrack');
+    if (isLooping) {
+        $loopBtn.addClass('active');
+    } else {
+        $loopBtn.removeClass('active');
+    }
+}
+
+function toggleVolume() {
+    isMuted = !isMuted;
+    
+    if (isMuted) {
+        audio.volume = 0;
+        $('.retro-player').removeClass('visible');
+    } else {
+        audio.volume = 1;
+        $('.retro-player').addClass('visible');
+    }
+    
+    updateVolumeIcon(isMuted);
+}
+
+function updateVolumeIcon(muted) {
+    const $volumeBtn = $('.volume-btn');
+    if (muted) {
+        $volumeBtn.find('svg path').attr('d', 'M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z');
+    } else {
+        $volumeBtn.find('svg path').attr('d', 'M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z');
+    }
+    $volumeBtn.toggleClass('active', !muted);
 } 
