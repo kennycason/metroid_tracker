@@ -1,7 +1,7 @@
 :root {
     --background-color: #000000;
     --text-color: #e0e0e0;
-    --accent-color: #ff6b6b;
+    --accent-color: #FFB800;  /* Classic Metroid orange/yellow */
     --panel-bg: #000000;
     --header-height: 60px;  /* New variable for header height */
     --tile-size: 32px;
@@ -9,12 +9,17 @@
     --tile-total: 33px;  /* tile-size + gap */
 }
 
+@font-face {
+    font-family: 'MetroidFont';
+    src: url('https://fonts.cdnfonts.com/css/metroid-prime-hunters') format('woff2');
+}
+
 body {
     margin: 0;
     padding: 0;
     background-color: var(--background-color);
     color: var(--text-color);
-    font-family: 'Arial', sans-serif;
+    font-family: 'MetroidFont', 'Arial', sans-serif;
     height: 100vh;  /* Full viewport height */
     overflow: hidden;  /* Prevent scrolling */
 }
@@ -43,8 +48,10 @@ h1 {
     text-transform: uppercase;
     letter-spacing: 2px;
     margin: 0;
-    font-size: 1.5em;
-    color: var(--text-color); 
+    font-size: 2em;
+    color: var(--accent-color);
+    font-family: 'MetroidFont', 'Arial', sans-serif;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .tracker-container {
