@@ -36,14 +36,27 @@ $(document).ready(() => {
         $(this).addClass('active');
         currentView = view;
         
-        // When switching to 100% view, find the first uncollected item
+        // When switching to 100% view, find the next uncollected item after the last collected one
         if (view == '100') {
             const sortedItems = Object.entries(items)
                 .map(([id, item]) => ({id: parseInt(id), ...item}))
                 .sort((a, b) => a.order100Percent - b.order100Percent);
-            currentNextItem = sortedItems.find(item => !collectedItems[item.id-1]);
+            
+            // Find the last collected item's order
+            const lastCollectedOrder = Math.max(...sortedItems
+                .filter(item => collectedItems[item.id-1])
+                .map(item => item.order100Percent), 0);
+            
+            // Find the next uncollected item after the last collected one
+            currentNextItem = sortedItems.find(item => 
+                !collectedItems[item.id-1] && item.order100Percent > lastCollectedOrder
+            );
+            
             if (currentNextItem) {
-                console.log('Initial next item to collect:', currentNextItem.name);
+                console.log('Next item to collect:', currentNextItem.name);
+            } else {
+                console.log('No more items to collect in 100% view');
+                currentNextItem = null;
             }
         } else {
             currentNextItem = null;
