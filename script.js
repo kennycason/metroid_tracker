@@ -121,6 +121,7 @@ function initializeMapZoom() {
     let isHovering = false;
     let isDragging = false;
     let lastX, lastY;
+    let isGesturing = false; // Track if we're in a gesture
 
     // Add hover detection
     $mapContainer.on('mouseenter', () => {
@@ -169,6 +170,38 @@ function initializeMapZoom() {
         isDragging = false;
         $mapContainer.css('cursor', 'zoom-in');
     });
+
+    // Add touchpad gesture support
+    $mapContainer[0].addEventListener('gesturestart', (e) => {
+        e.preventDefault();
+        isGesturing = true;
+    }, { passive: false });
+
+    $mapContainer[0].addEventListener('gesturechange', (e) => {
+        e.preventDefault();
+        if (!isGesturing) return;
+
+        const rect = $mapContainer[0].getBoundingClientRect();
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        // Calculate new scale
+        const oldScale = scale;
+        scale = Math.min(Math.max(scale * e.scale, minScale), maxScale);
+
+        // Adjust offsets to zoom towards center
+        if (scale !== oldScale) {
+            const scaleChange = scale / oldScale;
+            offsetX = centerX - (centerX - offsetX) * scaleChange;
+            offsetY = centerY - (centerY - offsetY) * scaleChange;
+            applyTransformWithConstraints();
+        }
+    }, { passive: false });
+
+    $mapContainer[0].addEventListener('gestureend', (e) => {
+        e.preventDefault();
+        isGesturing = false;
+    }, { passive: false });
 }
 
 // Move applyTransformWithConstraints to global scope
@@ -497,10 +530,10 @@ function checkItemSequence() {
     });
 }
 
-// Separate wheel handler function
+// Update handleWheel to not interfere with gestures
 function handleWheel(e) {
     const $mapContainer = $('.map-container');
-    if (!$mapContainer.is(':hover')) return;
+    if (!$mapContainer.is(':hover') || isGesturing) return;
     
     e.preventDefault();
     
