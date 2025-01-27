@@ -373,11 +373,20 @@ function appendItems($container, items) {
             // Find next uncollected item in the current view's order
             if (currentView == '100') {
                 console.log('Current view is 100%');
-                const currentOrder = item.order100Percent;
                 const sortedItems = Object.entries(items)
                     .map(([id, item]) => ({id: parseInt(id), ...item}))
                     .sort((a, b) => a.order100Percent - b.order100Percent);
-                currentNextItem = sortedItems.find(item => !collectedItems[item.id-1] && item.order100Percent > currentOrder);
+
+                // Find the last collected item's order
+                const lastCollectedOrder = Math.max(...sortedItems
+                    .filter(item => collectedItems[item.id-1])
+                    .map(item => item.order100Percent), 0);
+                
+                // Find the next uncollected item after the last collected one
+                currentNextItem = sortedItems.find(item => 
+                    !collectedItems[item.id-1] && item.order100Percent > lastCollectedOrder
+                );
+
                 if (currentNextItem) {
                     console.log('Next item to collect:', currentNextItem.name);
                 } else {
