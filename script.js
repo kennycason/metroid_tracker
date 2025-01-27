@@ -35,7 +35,22 @@ $(document).ready(() => {
         $('.toggle-btn').removeClass('active');
         $(this).addClass('active');
         currentView = view;
+        
+        // When switching to 100% view, find the first uncollected item
+        if (view == '100') {
+            const sortedItems = Object.entries(items)
+                .map(([id, item]) => ({id: parseInt(id), ...item}))
+                .sort((a, b) => a.order100Percent - b.order100Percent);
+            currentNextItem = sortedItems.find(item => !collectedItems[item.id-1]);
+            if (currentNextItem) {
+                console.log('Initial next item to collect:', currentNextItem.name);
+            }
+        } else {
+            currentNextItem = null;
+        }
+        
         updateItemList();
+        createItemOverlay();
     });
 });
 
@@ -370,13 +385,34 @@ function appendItems($container, items) {
 function createItemOverlay() {
     const $overlay = $('#item-overlay');
     const $map = $('#metroid-map');
+    const $container = $('.map-container');
     
     $overlay.empty();
     console.log('Current view:', currentView);
 
-    // Get basic scaling factors
-    const scaleX = $map.width() / $map[0].naturalWidth;
-    const scaleY = $map.height() / $map[0].naturalHeight;
+    // Get all relevant dimensions
+    const mapNaturalWidth = $map[0].naturalWidth;
+    const mapNaturalHeight = $map[0].naturalHeight;
+    const containerRect = $container[0].getBoundingClientRect();
+
+    // Calculate the displayed dimensions while maintaining aspect ratio
+    const containerAspect = containerRect.width / containerRect.height;
+    const mapAspect = mapNaturalWidth / mapNaturalHeight;
+
+    let displayWidth, displayHeight;
+    if (containerAspect > mapAspect) {
+        // Height is the limiting factor
+        displayHeight = containerRect.height;
+        displayWidth = displayHeight * mapAspect;
+    } else {
+        // Width is the limiting factor
+        displayWidth = containerRect.width;
+        displayHeight = displayWidth / mapAspect;
+    }
+
+    // Calculate scaling based on the displayed dimensions
+    const scaleX = displayWidth / mapNaturalWidth;
+    const scaleY = displayHeight / mapNaturalHeight;
 
     // Create markers for collected items and next item
     Object.entries(items).forEach(([id, item]) => {
