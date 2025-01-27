@@ -16,7 +16,6 @@ const itemShortCodes = {
     'varia_suit': 'vs',
     'hi_jump': 'hj',
     'wave_beam': 'wb',
-    'ice_beam': 'ib',
     'screw_attack': 'sa',
     'long_beam': 'lb',
     'bombs': 'b',
@@ -606,9 +605,6 @@ function generateShareUrl() {
         energy: []
     };
 
-    // Track if ice beam is collected in either location
-    let hasIceBeam = false;
-
     // Collect state
     Object.entries(items).forEach(([id, item]) => {
         if (collectedItems[id-1]) {
@@ -617,17 +613,17 @@ function generateShareUrl() {
             } else if (item.type === 'energy') {
                 collectedState.energy.push(parseInt(id) - 200);
             } else if (item.type === 'ice_beam') {
-                hasIceBeam = true;
+                // Handle ice beams separately based on their IDs
+                if (id === '106') { // Ice Beam Br
+                    collectedState.items['ib'] = 1;
+                } else if (id === '107') { // Ice Beam No
+                    collectedState.items['ib2'] = 1;
+                }
             } else if (itemShortCodes[item.type]) {
                 collectedState.items[itemShortCodes[item.type]] = 1;
             }
         }
     });
-
-    // Add ice beam if collected in either location
-    if (hasIceBeam) {
-        collectedState.items['ib'] = 1;
-    }
 
     // Build URL parts manually to avoid escaping
     let urlParts = [];
@@ -654,7 +650,7 @@ function loadStateFromUrl() {
     // Reset collection state
     collectedItems.fill(false);
 
-    // Load items
+    // Load regular items
     Object.entries(itemShortCodes).forEach(([type, code]) => {
         if (params.has(code)) {
             // Find and collect the item
@@ -665,6 +661,16 @@ function loadStateFromUrl() {
             });
         }
     });
+
+    // Handle ice beams separately
+    if (params.has('ib')) {
+        // Collect Ice Beam Br
+        collectedItems[106-1] = true;
+    }
+    if (params.has('ib2')) {
+        // Collect Ice Beam No
+        collectedItems[107-1] = true;
+    }
 
     // Load missiles
     if (params.has('m')) {
