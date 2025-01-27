@@ -234,7 +234,7 @@ h1 {
 */
 
 .item-section {
-    margin-bottom: 5px;
+    margin-bottom: 3px;
 }
 
 .item-section:first-child {
@@ -243,17 +243,17 @@ h1 {
 
 .item-section h3 {
     color: var(--accent-color);
-    margin-bottom: 5px;
-    margin-top: 5px;  /* Add small top margin */
+    margin-bottom: 3px;
+    margin-top: 3px;
 }
 
 .item-entry {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 5px;
+    gap: 6px;
+    margin-bottom: 2px;
     cursor: pointer;
-    padding: 5px;
+    padding: 3px;
     font-size: 0.85em;
     white-space: nowrap;
 }
