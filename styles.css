@@ -343,7 +343,7 @@ h1 {
 
 .share-btn {
     width: 32px;
-    height: 24px; /* Reduced from 28px to match other buttons better */
+    height: 25px; /* Increased from 24px by 1px */
     padding: 4px;
     margin-right: 4px;
     background: transparent;

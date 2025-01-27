@@ -19,7 +19,9 @@ const itemShortCodes = {
     'ice_beam': 'ib',
     'screw_attack': 'sa',
     'long_beam': 'lb',
-    'bombs': 'b'
+    'bombs': 'b',
+    'kraid': 'k',
+    'ridley': 'r'
 };
 
 // Initialize the tracker
@@ -604,6 +606,9 @@ function generateShareUrl() {
         energy: []
     };
 
+    // Track if ice beam is collected in either location
+    let hasIceBeam = false;
+
     // Collect state
     Object.entries(items).forEach(([id, item]) => {
         if (collectedItems[id-1]) {
@@ -611,11 +616,18 @@ function generateShareUrl() {
                 collectedState.missiles.push(parseInt(id) - 300);
             } else if (item.type === 'energy') {
                 collectedState.energy.push(parseInt(id) - 200);
+            } else if (item.type === 'ice_beam') {
+                hasIceBeam = true;
             } else if (itemShortCodes[item.type]) {
                 collectedState.items[itemShortCodes[item.type]] = 1;
             }
         }
     });
+
+    // Add ice beam if collected in either location
+    if (hasIceBeam) {
+        collectedState.items['ib'] = 1;
+    }
 
     // Build URL parts manually to avoid escaping
     let urlParts = [];
