@@ -105,7 +105,19 @@ $(document).ready(() => {
     $('.share-btn').on('click', () => {
         const shareUrl = generateShareUrl();
         navigator.clipboard.writeText(shareUrl).then(() => {
-            alert('Share URL copied to clipboard!');
+            // Create notification if it doesn't exist
+            let $notification = $('.notification');
+            if ($notification.length === 0) {
+                $notification = $('<div class="notification">URL copied!</div>').appendTo('body');
+            }
+            
+            // Show notification
+            $notification.text('URL copied!').addClass('show');
+            
+            // Hide after 3.5 seconds
+            setTimeout(() => {
+                $notification.removeClass('show');
+            }, 1000);
         }).catch(err => {
             console.error('Failed to copy URL:', err);
             prompt('Copy this share URL:', shareUrl);
