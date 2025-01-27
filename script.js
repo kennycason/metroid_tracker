@@ -1,6 +1,8 @@
 let energyTanks = 0;
 let missiles = 0;
 let scale = 1;
+let offsetX = 0;
+let offsetY = 0;
 
 // Initialize the tracker
 $(document).ready(() => {
@@ -16,6 +18,10 @@ $(document).ready(() => {
         createItemOverlay();
         applyTransformWithConstraints();
     });
+
+    // Add non-passive wheel event listener
+    const mapContainer = document.querySelector('.map-container');
+    mapContainer.addEventListener('wheel', handleWheel, { passive: false });
 });
 
 function updateCounters() {
@@ -65,18 +71,13 @@ function initializeMagnifier() {
 function initializeMapZoom() {
     const $map = $('#metroid-map');
     const $mapContainer = $('.map-container');
+    const $overlay = $('#item-overlay');
     
     const minScale = 0.5;
     const maxScale = 4;
-    const scaleStep = 0.1;
     let isHovering = false;
-    let offsetX = 0;
-    let offsetY = 0;
     let isDragging = false;
     let lastX, lastY;
-
-    // Temporarily hide magnifier
-    $('.magnifier').hide();
 
     // Add hover detection
     $mapContainer.on('mouseenter', () => {
@@ -87,13 +88,12 @@ function initializeMapZoom() {
 
     // Add click handler for coordinate logging
     $mapContainer.on('click', (e) => {
-        if (isDragging) return; // Don't log if we're dragging
+        if (isDragging) return;
         
         const rect = $mapContainer[0].getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
         const mouseY = e.clientY - rect.top;
 
-        // Calculate actual coordinates taking into account scale and offset
         const actualX = Math.round((mouseX - offsetX) / scale);
         const actualY = Math.round((mouseY - offsetY) / scale);
         
@@ -102,7 +102,7 @@ function initializeMapZoom() {
 
     // Add drag functionality
     $mapContainer.on('mousedown', (e) => {
-        if (scale > 1) {  // Only allow dragging when zoomed in
+        if (scale > 1) {
             isDragging = true;
             lastX = e.clientX;
             lastY = e.clientY;
@@ -125,32 +125,6 @@ function initializeMapZoom() {
     }).on('mouseup', () => {
         isDragging = false;
         $mapContainer.css('cursor', 'zoom-in');
-    });
-
-    // Handle zoom
-    $(window).on('wheel', (e) => {
-        if (!isHovering) return;
-        
-        e.preventDefault();
-        
-        const rect = $mapContainer[0].getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-
-        const x = (mouseX - offsetX) / scale;
-        const y = (mouseY - offsetY) / scale;
-        
-        const oldScale = scale;
-        if (e.originalEvent.deltaY < 0) {
-            scale = Math.min(scale * (1 + scaleStep), maxScale);
-        } else {
-            scale = Math.max(scale * (1 - scaleStep), minScale);
-        }
-
-        offsetX = mouseX - x * scale;
-        offsetY = mouseY - y * scale;
-
-        applyTransformWithConstraints();
     });
 }
 
@@ -198,7 +172,7 @@ const sectionOrder = ["bosses", "items", "energy", "missile"];
 const itemTypes = {
     "bosses": ["kraid", "ridley"],
     "items": [
-        "morph_ball", 
+        "maru_mari", 
         "bombs", 
         "hi_jump", 
         "varia_suit", 
@@ -215,7 +189,7 @@ const items = {
     1: {type: "kraid", x: 1805, y: 6865, area: "kraids_lair", name: "Kraid", order100Percent: 34},
     2: {type: "ridley", x: 4133, y: 6860, area: "ridleys_lair", name: "Ridley", order100Percent: 41},
     // Items
-    100: {type: "morph_ball", x: 360, y: 3270, area: "brinstar", name: "Morph Ball", order100Percent: 2},
+    100: {type: "maru_mari", x: 360, y: 3270, area: "brinstar", name: "Maru Mari", order100Percent: 2},
     101: {type: "bombs", x: 6120, y: 1030, area: "brinstar", name: "Bombs", order100Percent: 6},
     102: {type: "hi_jump", x: 6634, y: 3940, area: "norfair", name: "Hi Jump", order100Percent: 10},
     103: {type: "varia_suit", x: 3648, y: 327, area: "brinstar", name: "Varia Suit", order100Percent: 25},
@@ -451,4 +425,42 @@ function checkItemSequence() {
     numbers.forEach(num => {
         console.log(`${num}: {x: ${items[num].x}, y: ${items[num].y}}`);
     });
+}
+
+// Separate wheel handler function
+function handleWheel(e) {
+    const $mapContainer = $('.map-container');
+    if (!$mapContainer.is(':hover')) return;
+    
+    e.preventDefault();
+    
+    const rect = $mapContainer[0].getBoundingClientRect();
+    const $map = $('#metroid-map');
+    const mapRect = $map[0].getBoundingClientRect();
+
+    // Calculate mouse position relative to the map's visible area
+    const mouseX = e.clientX - mapRect.left;
+    const mouseY = e.clientY - mapRect.top;
+
+    // Calculate the point on the map in its natural coordinates
+    const pointX = mouseX / scale;
+    const pointY = mouseY / scale;
+    
+    // Update scale
+    const scaleStep = 0.1;
+    const minScale = 0.5;
+    const maxScale = 4;
+    
+    const oldScale = scale;
+    if (e.deltaY < 0) {
+        scale = Math.min(scale * (1 + scaleStep), maxScale);
+    } else {
+        scale = Math.max(scale * (1 - scaleStep), minScale);
+    }
+
+    // Calculate new offsets to keep the mouse point fixed
+    offsetX += mouseX - (pointX * scale);
+    offsetY += mouseY - (pointY * scale);
+
+    applyTransformWithConstraints();
 } 
