@@ -382,14 +382,12 @@ function createItemOverlay() {
     const scaleY = displayHeight / mapNaturalHeight;
 
     // Position the overlay to match the map's dimensions
-    // Only apply horizontal centering, align to top vertically
-    const offsetX = Math.max((containerRect.width - displayWidth) / 2, 0);
-    
+    // Align to top-left corner, just like the map
     $overlay.css({
         position: 'absolute',
         width: `${displayWidth}px`,
         height: `${displayHeight}px`,
-        left: `${offsetX}px`,
+        left: '0',
         top: '0',
         'transform-origin': '0 0'
     });
@@ -427,7 +425,6 @@ function createItemOverlay() {
     console.log(`Container: ${containerRect.width}x${containerRect.height}`);
     console.log(`Display: ${displayWidth}x${displayHeight}`);
     console.log(`Scale: ${scaleX.toFixed(4)}x${scaleY.toFixed(4)}`);
-    console.log(`Offset X: ${offsetX}`);
 }
 
 // Sort and check items
