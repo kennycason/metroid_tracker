@@ -212,10 +212,11 @@ function initializeMapZoom() {
     const $overlay = $('#item-overlay');
     
     const minScale = 0.5;
-    const maxScale = 4;
+    const maxScale = 8;
     let isHovering = false;
     let isDragging = false;
     let lastX, lastY;
+    let touchpadPressed = false;
 
     // Add hover detection
     $mapContainer.on('mouseenter', () => {
@@ -228,6 +229,7 @@ function initializeMapZoom() {
     }).on('mouseleave', () => {
         isHovering = false;
         isDragging = false;
+        touchpadPressed = false;
         $mapContainer.css('cursor', 'zoom-in');
     });
 
@@ -248,24 +250,28 @@ function initializeMapZoom() {
         console.log(`Clicked coordinates - x: ${actualX}, y: ${actualY}`);
     });
 
-    // Add drag functionality for both mouse and touchpad
+    // Add drag functionality
     $mapContainer.on('mousedown', (e) => {
-        // Handle both left click and touchpad click
-        if ((e.button === 0 || e.button === 1) && !e.ctrlKey) {
+        // Handle both left click and middle click
+        if (e.button === 1) {
+            e.preventDefault(); // Prevent default middle-click scroll
+        }
+        
+        if ((e.button === 0 || e.button === 1) && !e.ctrlKey && scale > 1) {
             isDragging = true;
+            touchpadPressed = true;
             lastX = e.clientX;
             lastY = e.clientY;
             $mapContainer.css('cursor', 'grabbing');
             
-            // Prevent middle click scroll behavior
-            if (e.button === 1) {
-                e.preventDefault();
-            }
+            // Prevent text selection during drag
+            e.preventDefault();
         }
     });
 
+    // Handle drag on window to catch fast movements
     $(window).on('mousemove', (e) => {
-        if (!isDragging) return;
+        if (!isDragging && !touchpadPressed) return;
         
         const deltaX = e.clientX - lastX;
         const deltaY = e.clientY - lastY;
@@ -278,15 +284,15 @@ function initializeMapZoom() {
         applyTransformWithConstraints();
     });
 
+    // Handle mouseup on window to catch releases outside container
     $(window).on('mouseup', (e) => {
-        if (e.button === 0 || e.button === 1) {
-            if (isDragging) {
-                isDragging = false;
-                if (isHovering) {
-                    $mapContainer.css('cursor', scale > 1 ? 'grab' : 'zoom-in');
-                } else {
-                    $mapContainer.css('cursor', 'zoom-in');
-                }
+        if ((e.button === 0 || e.button === 1)) {
+            isDragging = false;
+            touchpadPressed = false;
+            if (isHovering) {
+                $mapContainer.css('cursor', scale > 1 ? 'grab' : 'zoom-in');
+            } else {
+                $mapContainer.css('cursor', 'zoom-in');
             }
         }
     });
@@ -297,30 +303,15 @@ function initializeMapZoom() {
         isGesturing = true;
     }, { passive: false });
 
-    $mapContainer[0].addEventListener('gesturechange', (e) => {
+    // Add touchpad two-finger drag support
+    $mapContainer[0].addEventListener('wheel', (e) => {
+        if (e.ctrlKey) return; // Let the zoom handler deal with pinch-zoom
+        if (scale <= 1) return; // Only allow dragging when zoomed in
+        
         e.preventDefault();
-        if (!isGesturing) return;
-
-        const rect = $mapContainer[0].getBoundingClientRect();
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-
-        // Calculate new scale
-        const oldScale = scale;
-        scale = Math.min(Math.max(scale * e.scale, minScale), maxScale);
-
-        // Adjust offsets to zoom towards center
-        if (scale !== oldScale) {
-            const scaleChange = scale / oldScale;
-            offsetX = centerX - (centerX - offsetX) * scaleChange;
-            offsetY = centerY - (centerY - offsetY) * scaleChange;
-            applyTransformWithConstraints();
-        }
-    }, { passive: false });
-
-    $mapContainer[0].addEventListener('gestureend', (e) => {
-        e.preventDefault();
-        isGesturing = false;
+        offsetX -= e.deltaX;
+        offsetY -= e.deltaY;
+        applyTransformWithConstraints();
     }, { passive: false });
 }
 
@@ -681,7 +672,7 @@ function handleWheel(e) {
     // Update scale
     const scaleStep = 0.1;
     const minScale = 0.5;
-    const maxScale = 4;
+    const maxScale = 8;
     
     const oldScale = scale;
     if (e.deltaY < 0) {
@@ -946,8 +937,8 @@ function initializeTouchGestures() {
             const pointY = (centerY - rect.top - offsetY) / scale;
 
             // Calculate scale change with reduced sensitivity
-            const scaleChange = 1 + (currentDistance - lastTouchDistance) / (lastTouchDistance * 2); // Reduced sensitivity
-            const newScale = Math.min(Math.max(scale * scaleChange, 0.5), 4);
+            const scaleChange = 1 + (currentDistance - lastTouchDistance) / (lastTouchDistance * 4); // Further reduced sensitivity
+            const newScale = Math.min(Math.max(scale * scaleChange, 0.5), 8); // Increased from 4 to 8
             
             if (newScale !== scale) {
                 scale = newScale;
