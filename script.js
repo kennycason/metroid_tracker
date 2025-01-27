@@ -26,7 +26,7 @@ const itemShortCodes = {
 // Add at the top with other global variables
 const tracks = [
     { title: "Intro", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/1%20-%20Intro.mp3" },
-    { title: "Enter: Samus", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/2%20-%20Enter%20%20Samus.mp3" },
+    // { title: "Enter: Samus", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/2%20-%20Enter%20%20Samus.mp3" },
     { title: "Brinstar", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/3%20-%20Brinstar.mp3" },
     { title: "Norfair", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/4%20-%20Norfair.mp3" },
     { title: "Kraid's Lair", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/5%20-%20Kraid%27s%20Lair.mp3" },
