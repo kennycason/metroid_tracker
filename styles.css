@@ -486,3 +486,9 @@ h1 {
 .retro-player.visible + .volume-btn.standalone {
     display: none;
 }
+
+.sprite.next-item {
+    filter: brightness(200%) !important;
+    border: 1px solid #fff;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+}
