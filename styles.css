@@ -82,8 +82,8 @@ h1 {
 
 .stats-header {
     margin-top: 0;
-    margin-bottom: 10px; 
-    padding-bottom: 10px; 
+    margin-bottom: 6px;  /* Reduced from 10px */
+    padding-bottom: 6px; /* Reduced from 10px */
     border-bottom: 1px solid var(--accent-color);
     display: flex;
     flex-direction: column;  
@@ -256,7 +256,7 @@ h1 {
 */
 
 .item-section {
-    margin-bottom: 0;  /* Removed section margin */
+    margin-bottom: 0;
 }
 
 .item-section:first-child {
@@ -266,9 +266,9 @@ h1 {
 .item-section h3 {
     color: var(--accent-color);
     margin-bottom: 0;
-    margin-top: 1px;
+    margin-top: 0;  /* Changed from 1px */
     padding: 1px 0;
-    font-family: Arial, sans-serif;  /* Changed to standard font */
+    font-family: Arial, sans-serif;
     font-size: 0.9em;
 }
 
@@ -343,7 +343,8 @@ h1 {
     overflow-y: scroll;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    max-height: calc(100vh - var(--header-height) - 120px);  /* Reduced from 140px */
+    max-height: calc(100vh - var(--header-height) - 120px);
+    margin-top: 2px;  /* Add small margin to maintain some spacing */
 }
 
 .items-list::-webkit-scrollbar {
