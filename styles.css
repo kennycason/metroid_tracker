@@ -82,8 +82,7 @@ h1 {
 
 .stats-header {
     margin-top: 0;
-    margin-bottom: 6px;  /* Reduced from 10px */
-    padding-bottom: 6px; /* Reduced from 10px */
+    padding-bottom: 6px;
     border-bottom: 1px solid var(--accent-color);
     display: flex;
     flex-direction: column;  
@@ -362,7 +361,7 @@ h1 {
 .view-toggle {
     display: flex;
     gap: 4px;
-    align-items: center;
+    margin-top: 4px;
 }
 
 .controls-grid {
@@ -425,7 +424,7 @@ h1 {
 }
 
 .toggle-btn {
-    width: 45px;
+    flex: 1;
     height: 24px;
     background: transparent;
     border: 1px solid var(--accent-color);
@@ -451,7 +450,7 @@ h1 {
 .retro-player {
     display: none;
     position: absolute;
-    left: 142px;
+    left: 92px;
     top: 5px;
     flex-direction: column;
     gap: 4px;    
