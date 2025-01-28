@@ -466,7 +466,7 @@ function updateItemList() {
             });
             
             $section.append($('<h3>', {
-                text: section.charAt(0).toUpperCase() + section.slice(1)
+                text: section.toUpperCase()
             }));
 
             const sectionItems = [];

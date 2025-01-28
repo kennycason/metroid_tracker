@@ -473,7 +473,7 @@ h1 {
 
 .audio-btn, .volume-btn {
     width: 18px;
-    height: 18px;
+    height: 20px;
     padding: 2px;
     background: transparent;
     border: 1px solid var(--accent-color);
@@ -500,31 +500,31 @@ h1 {
 .track-display {
     background: #143;
     border: 1px solid var(--accent-color);
-    height: 16px;
+    height: 17px;
     overflow: hidden;
     position: relative;
-    width: 135px;
+    width: 90px;
     transition: width 0.2s ease;
 }
 
 .track-display.jp {
-    width: 180px;
+    width: 90px;
 }
 
 .track-scroller {
     position: absolute;
     white-space: nowrap;
     will-change: transform;
-    font-family: Arial, sans-serif;  /* Changed to standard font */
+    font-family: Arial, sans-serif;
     color: var(--accent-color);
     font-size: 0.7em;
-    line-height: 16px;
-    padding: 0 6px;
+    line-height: 18px;
+    padding: 0 5px;
 }
 
 @keyframes scroll {
     0% {
-        transform: translateX(135px);
+        transform: translateX(90px);
     }
     100% {
         transform: translateX(-100%);
@@ -583,8 +583,7 @@ h1 {
     align-items: center;
     justify-content: center;
     font-size: 0.7em;
-    font-family: Arial, sans-serif;  /* Changed to standard font */
-}
+    font-family: Arial, sans-serif; 
 
 .lang-btn:hover {
     background: var(--accent-color);
