@@ -1,16 +1,22 @@
+// Global state variables
 let energyTanks = 0;
 let missiles = 0;
 let scale = 1;
 let offsetX = 0;
 let offsetY = 0;
-
-// Add view state variable
 let currentView = 'type';
-
-// Add at the top with other global variables
 let currentNextItem = null;
+let isGesturing = false;
+let lastTouchDistance = 0;
 
-// Add at the top with other global variables
+// Audio state
+let currentTrack = 0;
+let audio = null;
+let isPlaying = false;
+let isLooping = false;
+let isMuted = true;
+
+// Item type mappings
 const itemShortCodes = {
     'maru_mari': 'mm',
     'varia_suit': 'vs',
@@ -23,40 +29,96 @@ const itemShortCodes = {
     'ridley': 'r'
 };
 
-// Add at the top with other global variables
+// Audio tracks configuration
 const tracks = [
     { title: "Intro", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/1%20-%20Intro.mp3" },
-    // { title: "Enter: Samus", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/2%20-%20Enter%20%20Samus.mp3" },
     { title: "Brinstar", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/3%20-%20Brinstar.mp3" },
     { title: "Norfair", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/4%20-%20Norfair.mp3" },
     { title: "Kraid's Lair", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/5%20-%20Kraid%27s%20Lair.mp3" },
     { title: "Ridley's Lair", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/6%20-%20Ridley%27s%20Lair.mp3" },
     { title: "Chozos", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/7%20-%20Chozos.mp3" },
-    // { title: "Power Up", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/8%20-%20Power%20Up.mp3" },
     { title: "Tourian", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/9%20-%20Tourian.mp3" },
     { title: "Mother Brain", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/10%20-%20Mother%20Brain.mp3" },
     { title: "Quick Escape", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/11%20-%20Quick%20Escape.mp3" },
     { title: "Mission Completed Successfully", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/12%20-%20Mission%20Completed%20Successfully.mp3" }
 ];
 
-let currentTrack = 0;
-let audio = null;
-let isPlaying = false;
-let isLooping = false;
-let isMuted = true;
+// Group types for section ordering
+const sectionOrder = ["bosses", "items", "energy", "missile"];
+const itemTypes = {
+    "bosses": ["kraid", "ridley"],
+    "items": [
+        "maru_mari", 
+        "bombs", 
+        "hi_jump", 
+        "varia_suit", 
+        "screw_attack", 
+        "long_beam", 
+        "ice_beam", 
+        "wave_beam"
+    ],
+    "energy": ["energy"],
+    "missile": ["missile"]
+};
 
-// Add at the top with other global variables
-let isGesturing = false;
-let lastTouchDistance = 0;
+const items = {
+    1: {type: "kraid", x: 1885, y: 6882, area: "kraids_lair", name: "Kraid", order100Percent: 34},
+    2: {type: "ridley", x: 4201, y: 6805, area: "ridleys_lair", name: "Ridley", order100Percent: 41},
+    // Items
+    100: {type: "maru_mari", x: 360, y: 3270, area: "brinstar", name: "Maru Mari", order100Percent: 2},
+    101: {type: "bombs", x: 6264, y: 1016, area: "brinstar", name: "Bombs", order100Percent: 6},
+    102: {type: "hi_jump", x: 6777, y: 3896, area: "norfair", name: "Hi Jump", order100Percent: 10},
+    103: {type: "varia_suit", x: 3705, y: 296, area: "brinstar", name: "Varia Suit", order100Percent: 25},
+    104: {type: "screw_attack", x: 3702, y: 3656, area: "norfair", name: "Screw Attack", order100Percent: 19},
+    105: {type: "long_beam", x: 1656, y: 1017, area: "brinstar", name: "Long Beam", order100Percent: 4},
+    106: {type: "ice_beam", x: 4729, y: 1974, area: "brinstar", name: "Ice Beam Br", order100Percent: 43},
+    107: {type: "ice_beam", x: 6523, y: 2696, area: "norfair", name: "Ice Beam No", order100Percent: 16},
+    108: {type: "wave_beam", x: 4470, y: 4856, area: "norfair", name: "Wave Beam", order100Percent: 23},
+
+    // Energy Tanks
+    201: {type: "energy", x: 6264, y: 1574, area: "brinstar", name: "Energy Tank", order100Percent: 5},
+    202: {type: "energy", x: 6440, y: 4390, area: "norfair", name: "Energy Tank", order100Percent: 20},
+    203: {type: "energy", x: 6776, y: 614, area: "brinstar", name: "Energy Tank", order100Percent: 27},
+    204: {type: "energy", x: 2408, y: 5140, area: "kraids_lair", name: "Energy Tank", order100Percent: 32},
+    205: {type: "energy", x: 2024, y: 6900, area: "norfair", name: "Energy Tank", order100Percent: 35},
+    206: {type: "energy", x: 4168, y: 5879, area: "ridleys_lair", name: "Energy Tank", order100Percent: 38},
+    207: {type: "energy", x: 3686, y: 6821, area: "ridleys_lair", name: "Energy Tank", order100Percent: 42},
+    208: {type: "energy", x: 2088, y: 3142, area: "brinstar", name: "Energy Tank", order100Percent: 44},
+
+    // Missiles
+    301: {type: "missile", x: 4471, y: 2505, area: "brinstar", name: "Missile", order100Percent: 3},
+    302: {type: "missile", x: 4425, y: 3175, area: "norfair", name: "Missile", order100Percent: 8},
+    303: {type: "missile", x: 4168, y: 3416, area: "norfair", name: "Missile", order100Percent: 9},
+    304: {type: "missile", x: 6982, y: 2458, area: "norfair", name: "Missile", order100Percent: 11},
+    305: {type: "missile", x: 6728, y: 2458, area: "norfair", name: "Missile", order100Percent: 12},
+    306: {type: "missile", x: 6468, y: 2458, area: "norfair", name: "Missile", order100Percent: 13},
+    307: {type: "missile", x: 6986, y: 2214, area: "norfair", name: "Missile", order100Percent: 14},
+    308: {type: "missile", x: 6732, y: 2214, area: "norfair", name: "Missile", order100Percent: 15},
+    309: {type: "missile", x: 4936, y: 3418, area: "norfair", name: "Missile", order100Percent: 17},
+    310: {type: "missile", x: 4680, y: 3418, area: "norfair", name: "Missile", order100Percent: 18},
+    311: {type: "missile", x: 4678, y: 5096, area: "norfair", name: "Missile", order100Percent: 21},
+    312: {type: "missile", x: 4934, y: 5096, area: "norfair", name: "Missile", order100Percent: 22},
+    313: {type: "missile", x: 6984, y: 4616, area: "norfair", name: "Missile", order100Percent: 24},
+    314: {type: "missile", x: 6008, y: 584, area: "brinstar", name: "Missile", order100Percent: 26},
+    315: {type: "missile", x: 2167, y: 4873, area: "kraids_lair", name: "Missile", order100Percent: 29},
+    316: {type: "missile", x: 888, y: 4873, area: "kraids_lair", name: "Missile", order100Percent: 30},
+    317: {type: "missile", x: 1144, y: 6313, area: "kraids_lair", name: "Missile", order100Percent: 31},
+    318: {type: "missile", x: 2424, y: 5830, area: "kraids_lair", name: "Missile", order100Percent: 33},
+    320: {type: "missile", x: 4567, y: 5624, area: "ridleys_lair", name: "Missile", order100Percent: 37},
+    321: {type: "missile", x: 5080, y: 7065, area: "ridleys_lair", name: "Missile", order100Percent: 39},
+    322: {type: "missile", x: 6104, y: 6344, area: "ridleys_lair", name: "Missile", order100Percent: 40}
+};
+
+// Collection state array
+const collectedItems = new Array(Object.keys(items).length).fill(false);
 
 // Initialize the tracker
 $(document).ready(() => {
     updateCounters();
-    // initializeMagnifier();  // Temporarily disabled in favor of zoom+drag
     checkItemSequence();
     updateItemList();
     initializeMapZoom();
-    createItemOverlay(); // Initial creation of markers
+    createItemOverlay();
     initializeTouchGestures();
 
     // Update during resize with debouncing
@@ -64,11 +126,8 @@ $(document).ready(() => {
     $(window).on('resize', () => {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
-            // First apply constraints to ensure map is within bounds
-            applyTransformWithConstraints();
-            // Then recreate overlay to ensure markers are positioned correctly
             createItemOverlay();
-        }, 100); // Debounce resize events
+        }, 100);
     });
 
     // Add non-passive wheel event listener
@@ -396,75 +455,6 @@ function applyTransformWithConstraints() {
         });
     });
 }
-
-// Group types for section ordering
-const sectionOrder = ["bosses", "items", "energy", "missile"];
-const itemTypes = {
-    "bosses": ["kraid", "ridley"],
-    "items": [
-        "maru_mari", 
-        "bombs", 
-        "hi_jump", 
-        "varia_suit", 
-        "screw_attack", 
-        "long_beam", 
-        "ice_beam", 
-        "wave_beam"
-    ],
-    "energy": ["energy"],
-    "missile": ["missile"]
-};
-
-const items = {
-    1: {type: "kraid", x: 1805, y: 6865, area: "kraids_lair", name: "Kraid", order100Percent: 34},
-    2: {type: "ridley", x: 4133, y: 6860, area: "ridleys_lair", name: "Ridley", order100Percent: 41},
-    // Items
-    100: {type: "maru_mari", x: 360, y: 3270, area: "brinstar", name: "Maru Mari", order100Percent: 2},
-    101: {type: "bombs", x: 6120, y: 1030, area: "brinstar", name: "Bombs", order100Percent: 6},
-    102: {type: "hi_jump", x: 6634, y: 3940, area: "norfair", name: "Hi Jump", order100Percent: 10},
-    103: {type: "varia_suit", x: 3648, y: 327, area: "brinstar", name: "Varia Suit", order100Percent: 25},
-    104: {type: "screw_attack", x: 3643, y: 3693, area: "norfair", name: "Screw Attack", order100Percent: 19},
-    105: {type: "long_beam", x: 1666, y: 1044, area: "brinstar", name: "Long Beam", order100Percent: 4},
-    106: {type: "ice_beam", x: 4651, y: 1985, area: "brinstar", name: "Ice Beam Br", order100Percent: 43},
-    107: {type: "ice_beam", x: 6370, y: 2752, area: "norfair", name: "Ice Beam No", order100Percent: 16},
-    108: {type: "wave_beam", x: 4392, y: 4901, area: "norfair", name: "Wave Beam", order100Percent: 23},
-
-    // Energy Tanks
-    201: {type: "energy", x: 6264, y: 1574, area: "brinstar", name: "Energy Tank", order100Percent: 5},
-    202: {type: "energy", x: 6317, y: 4440, area: "norfair", name: "Energy Tank", order100Percent: 20},
-    203: {type: "energy", x: 5866, y: 574, area: "brinstar", name: "Energy Tank", order100Percent: 27},
-    204: {type: "energy", x: 2357, y: 5193, area: "kraids_lair", name: "Energy Tank", order100Percent: 32},
-    205: {type: "energy", x: 1949, y: 6955, area: "norfair", name: "Energy Tank", order100Percent: 35},
-    206: {type: "energy", x: 4070, y: 5891, area: "ridleys_lair", name: "Energy Tank", order100Percent: 38},
-    207: {type: "energy", x: 3629, y: 6871, area: "ridleys_lair", name: "Energy Tank", order100Percent: 42},
-    208: {type: "energy", x: 2011, y: 3178, area: "brinstar", name: "Energy Tank", order100Percent: 44},
-
-    // Missiles
-    301: {type: "missile", x: 4368, y: 2510, area: "brinstar", name: "Missile", order100Percent: 3},
-    302: {type: "missile", x: 4330, y: 3208, area: "norfair", name: "Missile", order100Percent: 8},
-    303: {type: "missile", x: 4075, y: 3450, area: "norfair", name: "Missile", order100Percent: 9},
-    304: {type: "missile", x: 6821, y: 2520, area: "norfair", name: "Missile", order100Percent: 11},
-    305: {type: "missile", x: 6571, y: 2500, area: "norfair", name: "Missile", order100Percent: 12},
-    306: {type: "missile", x: 6317, y: 2485, area: "norfair", name: "Missile", order100Percent: 13},
-    307: {type: "missile", x: 6821, y: 2262, area: "norfair", name: "Missile", order100Percent: 14},
-    308: {type: "missile", x: 6571, y: 2277, area: "norfair", name: "Missile", order100Percent: 15},
-    309: {type: "missile", x: 4824, y: 3470, area: "norfair", name: "Missile", order100Percent: 17},
-    310: {type: "missile", x: 4560, y: 3460, area: "norfair", name: "Missile", order100Percent: 18},
-    311: {type: "missile", x: 4560, y: 5178, area: "norfair", name: "Missile", order100Percent: 21},
-    312: {type: "missile", x: 4848, y: 5173, area: "norfair", name: "Missile", order100Percent: 22},
-    313: {type: "missile", x: 6854, y: 4678, area: "norfair", name: "Missile", order100Percent: 24},
-    314: {type: "missile", x: 5866, y: 574, area: "brinstar", name: "Missile", order100Percent: 26},
-    315: {type: "missile", x: 2117, y: 4920, area: "kraids_lair", name: "Missile", order100Percent: 29},
-    316: {type: "missile", x: 874, y: 4935, area: "kraids_lair", name: "Missile", order100Percent: 30},
-    317: {type: "missile", x: 1123, y: 6361, area: "kraids_lair", name: "Missile", order100Percent: 31},
-    318: {type: "missile", x: 2357, y: 5866, area: "kraids_lair", name: "Missile", order100Percent: 33},
-    320: {type: "missile", x: 4426, y: 5653, area: "ridleys_lair", name: "Missile", order100Percent: 37},
-    321: {type: "missile", x: 4939, y: 7108, area: "ridleys_lair", name: "Missile", order100Percent: 39},
-    322: {type: "missile", x: 5938, y: 6381, area: "ridleys_lair", name: "Missile", order100Percent: 40}
-};
-
-// Collection state array
-const collectedItems = new Array(Object.keys(items).length).fill(false);
 
 // Update HTML to show items in left panel
 function updateItemList() {
