@@ -59,10 +59,16 @@ $(document).ready(() => {
     createItemOverlay(); // Initial creation of markers
     initializeTouchGestures();
 
-    // Update during resize, not just after
+    // Update during resize with debouncing
+    let resizeTimeout;
     $(window).on('resize', () => {
-        createItemOverlay();
-        applyTransformWithConstraints();
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            // First apply constraints to ensure map is within bounds
+            applyTransformWithConstraints();
+            // Then recreate overlay to ensure markers are positioned correctly
+            createItemOverlay();
+        }, 100); // Debounce resize events
     });
 
     // Add non-passive wheel event listener
@@ -315,7 +321,7 @@ function initializeMapZoom() {
     }, { passive: false });
 }
 
-// Update applyTransformWithConstraints to better scale items
+// Update applyTransformWithConstraints to better handle window resizing
 function applyTransformWithConstraints() {
     const $map = $('#metroid-map');
     const $mapContainer = $('.map-container');
@@ -328,14 +334,27 @@ function applyTransformWithConstraints() {
     
     // Allow dragging slightly beyond edges for smoother experience
     const buffer = 100; // pixels of extra dragging space
+    
+    // Adjust constraints based on container and scaled map size
     const minX = Math.min(0, containerRect.width - scaledMapWidth) - buffer;
     const maxX = buffer;
     const minY = Math.min(0, containerRect.height - scaledMapHeight) - buffer;
     const maxY = buffer;
 
-    // Constrain offsets
-    offsetX = Math.max(minX, Math.min(maxX, offsetX));
-    offsetY = Math.max(minY, Math.min(maxY, offsetY));
+    // If map is smaller than container, center it
+    if (scaledMapWidth < containerRect.width) {
+        offsetX = (containerRect.width - scaledMapWidth) / 2;
+    } else {
+        // Constrain offsets
+        offsetX = Math.max(minX, Math.min(maxX, offsetX));
+    }
+
+    if (scaledMapHeight < containerRect.height) {
+        offsetY = (containerRect.height - scaledMapHeight) / 2;
+    } else {
+        // Constrain offsets
+        offsetY = Math.max(minY, Math.min(maxY, offsetY));
+    }
 
     // If scale is 1 or less, reset position to top-left
     if (scale <= 1) {
