@@ -209,41 +209,41 @@ $(document).ready(() => {
     mapContainer.addEventListener('wheel', handleWheel, { passive: false });
 
     // Add view toggle handler
-    $('.toggle-btn').on('click', function() {
-        const view = $(this).data('view');
+    $('.toggle-btn').off('click').on('click', function(e) {
+        const view = String($(this).data('view'));
+        
+        // Remove active class from all buttons and add to clicked one
         $('.toggle-btn').removeClass('active');
         $(this).addClass('active');
+        
+        // Set the view BEFORE calling other functions
         currentView = view;
         
-        // When switching to 100% view, find the next uncollected item after the last collected one
-        if (view === '100') {
-            const sortedItems = Object.entries(items)
-                .map(([id, item]) => ({id: parseInt(id), ...item}))
-                .sort((a, b) => a.order100Percent - b.order100Percent);
-            
-            // Find the last collected item's order
-            const lastCollectedOrder = Math.max(...sortedItems
-                .filter(item => collectedItems[item.id-1])
-                .map(item => item.order100Percent), 0);
-            
-            // Find the next uncollected item after the last collected one
-            currentNextItem = sortedItems.find(item => 
-                !collectedItems[item.id-1] && item.order100Percent > lastCollectedOrder
-            );
-
-            if (currentNextItem) {
-                console.log('Next item to collect:', currentNextItem.name);
-            } else {
-                console.log('No more items to collect in 100% view');
-                currentNextItem = null;
-            }
-        } else {
+        // Clear next item when switching to type view
+        if (view === 'type') {
             currentNextItem = null;
+        } else if (view === '100') {
+            // Reset all items if none are collected
+            if (!collectedItems.some(item => item)) {
+                collectedItems.fill(false);
+                currentNextItem = items[100];
+                currentNextItem.id = 100;
+            } else {
+                updateNextItem();
+            }
         }
         
         updateItemList();
         createItemOverlay();
     });
+
+    // Initialize view state based on active button
+    const activeView = $('.toggle-btn.active').data('view');
+    currentView = activeView || 'type';
+    
+    if (currentView === '100') {
+        updateNextItem();
+    }
 
     // Initialize audio with error handling
     audio.addEventListener('error', (e) => {
@@ -603,8 +603,9 @@ function updateItemList() {
 function appendItems($container, items) {
     items.forEach((item) => {
         const isCollected = collectedItems[item.id-1];
+        const isNextItem = currentView === '100' && currentNextItem && parseInt(item.id) === currentNextItem.id;
         const $item = $('<div>', {
-            class: `item-entry${isCollected ? ' collected' : ''}`,
+            class: `item-entry${isCollected ? ' collected' : ''}${isNextItem ? ' next-item' : ''}`,
             'data-id': item.id
         });
 
@@ -613,7 +614,7 @@ function appendItems($container, items) {
         });
 
         const $sprite = $('<div>', {
-            class: `sprite sprite-${item.type}`
+            class: `sprite sprite-${item.type}${isNextItem ? ' next-item' : ''}`
         });
 
         const $name = $('<span>', {
@@ -625,40 +626,7 @@ function appendItems($container, items) {
         $container.append($item);
 
         $item.on('click', () => {
-            collectedItems[item.id-1] = !collectedItems[item.id-1];
-            $item.toggleClass('collected');
-            console.log(`Item ${item.id} (${item.type}) collected:`, collectedItems[item.id-1]);
-            
-            // Find next uncollected item in the current view's order
-            if (currentView == '100') {
-                console.log('Current view is 100%');
-                const sortedItems = Object.entries(items)
-                    .map(([id, item]) => ({id: parseInt(id), ...item}))
-                    .sort((a, b) => a.order100Percent - b.order100Percent);
-
-                // Find the last collected item's order
-                const lastCollectedOrder = Math.max(...sortedItems
-                    .filter(item => collectedItems[item.id-1])
-                    .map(item => item.order100Percent), 0);
-                
-                // Find the next uncollected item after the last collected one
-                currentNextItem = sortedItems.find(item => 
-                    !collectedItems[item.id-1] && item.order100Percent > lastCollectedOrder
-                );
-
-                if (currentNextItem) {
-                    console.log('Next item to collect:', currentNextItem.name);
-                } else {
-                    console.log('No more items to collect in 100% view');
-                    currentNextItem = null;
-                }
-            } else {
-                console.log('Current view is type');
-                currentNextItem = null;
-            }
-            
-            updateItemList();
-            createItemOverlay();
+            toggleItem(item.id-1);
         });
     });
 }
@@ -681,11 +649,9 @@ function createItemOverlay() {
 
     let displayWidth, displayHeight;
     if (containerAspect > mapAspect) {
-        // Height is the limiting factor
         displayHeight = containerRect.height;
         displayWidth = displayHeight * mapAspect;
     } else {
-        // Width is the limiting factor
         displayWidth = containerRect.width;
         displayHeight = displayWidth / mapAspect;
     }
@@ -694,15 +660,14 @@ function createItemOverlay() {
     const scaleX = displayWidth / mapNaturalWidth;
     const scaleY = displayHeight / mapNaturalHeight;
 
-    // Create markers for collected items and next item
     Object.entries(items).forEach(([id, item]) => {
         const isCollected = collectedItems[id-1];
         const isNextItem = currentView === '100' && currentNextItem && parseInt(id) === currentNextItem.id;
+        const shouldShow = isCollected || isNextItem || showAllItems;
         
-        // Show marker if item is collected OR if it's the next item in 100% view OR if showAllItems is true
-        if (isCollected || isNextItem || showAllItems) {
+        if (shouldShow) {
             const $marker = $('<div>', {
-                class: `item-marker ${item.type}-marker`,
+                class: `item-marker ${item.type}-marker${isCollected ? ' collected' : ''}${isNextItem ? ' next-item' : ''}`,
                 'data-id': id
             }).css({
                 position: 'absolute',
@@ -716,10 +681,6 @@ function createItemOverlay() {
                 class: `sprite sprite-${item.type}${isNextItem ? ' next-item' : ''}`
             });
 
-            if (isCollected) {
-                $marker.addClass('collected');
-            }
-
             $marker.append($sprite);
             $overlay.append($marker);
 
@@ -728,21 +689,16 @@ function createItemOverlay() {
                 e.preventDefault();
                 e.stopPropagation();
                 toggleItem(id-1);
-                updateItemList();
-                // Update marker's collected state immediately
-                $marker.toggleClass('collected', collectedItems[id-1]);
             });
         }
     });
 
-    // Apply map transform
     $overlay.css('transform', $map.css('transform'));
 }
 
 // Sort and check items
 function checkItemSequence() {
     const numbers = Object.keys(items).map(Number).sort((a, b) => a - b);
-    console.log('Sorted numbers:', numbers);
     
     // Check for missing numbers
     let missing = [];
@@ -1130,9 +1086,14 @@ function initializeTouchGestures() {
     }, { passive: true });
 }
 
-// Add after other global variables
+// Update toggleItem to handle view changes
 function toggleItem(index) {
     collectedItems[index] = !collectedItems[index];
+    
+    if (currentView === '100') {
+        updateNextItem();
+    }
+    
     updateItemList();
     createItemOverlay();
 }
@@ -1205,4 +1166,35 @@ function onNextPage() {
 function updateCreditsLanguage() {
     $('.credits-section').removeClass('active');
     $(`.credits-section.${currentLanguage}`).addClass('active');
+}
+
+// Update updateNextItem function
+function updateNextItem() {
+    if (currentView !== '100') {
+        currentNextItem = null;
+        return;
+    }
+
+    // If no items are collected, set Morphing Ball (ID: 100) as next item
+    if (!collectedItems.some(item => item)) {
+        currentNextItem = items[100];
+        currentNextItem.id = 100;
+        return;
+    }
+
+    const sortedItems = Object.entries(items)
+        .map(([id, item]) => ({id: parseInt(id), ...item}))
+        .sort((a, b) => a.order100Percent - b.order100Percent);
+
+    const collectedOrders = sortedItems
+        .filter(item => collectedItems[item.id-1])
+        .map(item => item.order100Percent);
+    
+    const lastCollectedOrder = Math.max(-1, ...collectedOrders);
+    
+    // Find first uncollected item after the last collected one
+    currentNextItem = sortedItems.find(item => 
+        !collectedItems[item.id-1] && 
+        item.order100Percent > lastCollectedOrder
+    );
 } 
