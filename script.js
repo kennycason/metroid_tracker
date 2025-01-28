@@ -283,6 +283,30 @@ $(document).ready(() => {
         scale *= 0.8;
         renderPage(pageNum);
     });
+
+    // Add credits modal handlers
+    $('.placeholder-btn').on('click', () => {
+        $('.credits-modal').addClass('visible');
+        updateCreditsLanguage();
+    });
+
+    $('.credits-modal .close-modal').on('click', () => {
+        $('.credits-modal').removeClass('visible');
+    });
+
+    // Close modal on escape key
+    $(document).on('keydown', (e) => {
+        if (e.key === 'Escape') {
+            $('.credits-modal').removeClass('visible');
+        }
+    });
+
+    // Close modal on click outside content
+    $('.credits-modal').on('click', (e) => {
+        if (e.target === e.currentTarget) {
+            $('.credits-modal').removeClass('visible');
+        }
+    });
 });
 
 function updateCounters() {
@@ -1118,9 +1142,10 @@ function toggleLanguage() {
     currentLanguage = currentLanguage === 'en' ? 'jp' : 'en';
     $('.lang-btn').text(currentLanguage === 'en' ? 'JP' : 'EN');
     $('.lang-btn').attr('title', `Switch to ${currentLanguage === 'en' ? 'Japanese' : 'English'}`);
-    $('.stats-panel, .track-display').toggleClass('jp', currentLanguage === 'jp');
+    $('.stats-panel').toggleClass('jp', currentLanguage === 'jp');
     updateItemList();
     updateTrackDisplay();
+    updateCreditsLanguage();
 }
 
 function renderPage(num) {
@@ -1174,4 +1199,10 @@ function onNextPage() {
     if (pageNum >= pdfDoc.numPages) return;
     pageNum++;
     queueRenderPage(pageNum);
+}
+
+// Add new function for credits language
+function updateCreditsLanguage() {
+    $('.credits-section').removeClass('active');
+    $(`.credits-section.${currentLanguage}`).addClass('active');
 } 
