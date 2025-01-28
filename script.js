@@ -9,6 +9,7 @@ let currentNextItem = null;
 let isGesturing = false;
 let lastTouchDistance = 0;
 let showAllItems = false;
+let currentLanguage = 'en';
 
 // Audio state
 let currentTrack = 0;
@@ -32,16 +33,16 @@ const itemShortCodes = {
 
 // Audio tracks configuration
 const tracks = [
-    { title: "Intro", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/1%20-%20Intro.mp3" },
-    { title: "Brinstar", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/3%20-%20Brinstar.mp3" },
-    { title: "Norfair", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/4%20-%20Norfair.mp3" },
-    { title: "Kraid's Lair", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/5%20-%20Kraid%27s%20Lair.mp3" },
-    { title: "Ridley's Lair", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/6%20-%20Ridley%27s%20Lair.mp3" },
-    { title: "Chozos", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/7%20-%20Chozos.mp3" },
-    { title: "Tourian", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/9%20-%20Tourian.mp3" },
-    { title: "Mother Brain", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/10%20-%20Mother%20Brain.mp3" },
-    { title: "Quick Escape", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/11%20-%20Quick%20Escape.mp3" },
-    { title: "Mission Completed Successfully", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/12%20-%20Mission%20Completed%20Successfully.mp3" }
+    { title: "Intro", jpTitle: "イントロ", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/1%20-%20Intro.mp3" },
+    { title: "Brinstar", jpTitle: "ブリンスタ", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/3%20-%20Brinstar.mp3" },
+    { title: "Norfair", jpTitle: "ノーファイア", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/4%20-%20Norfair.mp3" },
+    { title: "Kraid's Lair", jpTitle: "クレイドの巣", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/5%20-%20Kraid%27s%20Lair.mp3" },
+    { title: "Ridley's Lair", jpTitle: "リドリーの巣", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/6%20-%20Ridley%27s%20Lair.mp3" },
+    { title: "Chozos", jpTitle: "チョーゾー", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/7%20-%20Chozos.mp3" },
+    { title: "Tourian", jpTitle: "トーリアン", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/9%20-%20Tourian.mp3" },
+    { title: "Mother Brain", jpTitle: "マザーブレイン", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/10%20-%20Mother%20Brain.mp3" },
+    { title: "Quick Escape", jpTitle: "緊急脱出", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/11%20-%20Quick%20Escape.mp3" },
+    { title: "Mission Completed Successfully", jpTitle: "ミッション完了", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/12%20-%20Mission%20Completed%20Successfully.mp3" }
 ];
 
 // Group types for section ordering
@@ -63,51 +64,51 @@ const itemTypes = {
 };
 
 const items = {
-    1: {type: "kraid", x: 1885, y: 6882, area: "kraids_lair", name: "Kraid", order100Percent: 34},
-    2: {type: "ridley", x: 4201, y: 6805, area: "ridleys_lair", name: "Ridley", order100Percent: 41},
+    1: {type: "kraid", x: 1885, y: 6882, area: "kraids_lair", name: "Kraid", jpName: "クレイド", order100Percent: 34},
+    2: {type: "ridley", x: 4201, y: 6805, area: "ridleys_lair", name: "Ridley", jpName: "リドリー", order100Percent: 41},
     // Items
-    100: {type: "maru_mari", x: 360, y: 3270, area: "brinstar", name: "Maru Mari", order100Percent: 2},
-    101: {type: "bombs", x: 6264, y: 1016, area: "brinstar", name: "Bombs", order100Percent: 6},
-    102: {type: "hi_jump", x: 6777, y: 3896, area: "norfair", name: "Hi Jump", order100Percent: 10},
-    103: {type: "varia_suit", x: 3705, y: 296, area: "brinstar", name: "Varia Suit", order100Percent: 25},
-    104: {type: "screw_attack", x: 3702, y: 3656, area: "norfair", name: "Screw Attack", order100Percent: 19},
-    105: {type: "long_beam", x: 1656, y: 1017, area: "brinstar", name: "Long Beam", order100Percent: 4},
-    106: {type: "ice_beam", x: 4729, y: 1974, area: "brinstar", name: "Ice Beam Br", order100Percent: 43},
-    107: {type: "ice_beam", x: 6523, y: 2696, area: "norfair", name: "Ice Beam No", order100Percent: 16},
-    108: {type: "wave_beam", x: 4470, y: 4856, area: "norfair", name: "Wave Beam", order100Percent: 23},
+    100: {type: "maru_mari", x: 360, y: 3270, area: "brinstar", name: "Maru Mari", jpName: "まるまり", order100Percent: 2},
+    101: {type: "bombs", x: 6264, y: 1016, area: "brinstar", name: "Bombs", jpName: "ボム", order100Percent: 6},
+    102: {type: "hi_jump", x: 6777, y: 3896, area: "norfair", name: "Hi Jump", jpName: "ハイジャンプ", order100Percent: 10},
+    103: {type: "varia_suit", x: 3705, y: 296, area: "brinstar", name: "Varia Suit", jpName: "バリアスーツ", order100Percent: 25},
+    104: {type: "screw_attack", x: 3702, y: 3656, area: "norfair", name: "Screw Attack", jpName: "スクリューアタック", order100Percent: 19},
+    105: {type: "long_beam", x: 1656, y: 1017, area: "brinstar", name: "Long Beam", jpName: "ロングビーム", order100Percent: 4},
+    106: {type: "ice_beam", x: 4729, y: 1974, area: "brinstar", name: "Ice Beam Br", jpName: "アイスビーム Br", order100Percent: 43},
+    107: {type: "ice_beam", x: 6523, y: 2696, area: "norfair", name: "Ice Beam No", jpName: "アイスビーム No", order100Percent: 16},
+    108: {type: "wave_beam", x: 4470, y: 4856, area: "norfair", name: "Wave Beam", jpName: "ウェーブビーム", order100Percent: 23},
 
     // Energy Tanks
-    201: {type: "energy", x: 6264, y: 1574, area: "brinstar", name: "Energy Tank", order100Percent: 5},
-    202: {type: "energy", x: 6440, y: 4390, area: "norfair", name: "Energy Tank", order100Percent: 20},
-    203: {type: "energy", x: 6776, y: 614, area: "brinstar", name: "Energy Tank", order100Percent: 27},
-    204: {type: "energy", x: 2408, y: 5140, area: "kraids_lair", name: "Energy Tank", order100Percent: 32},
-    205: {type: "energy", x: 2024, y: 6900, area: "norfair", name: "Energy Tank", order100Percent: 35},
-    206: {type: "energy", x: 4168, y: 5879, area: "ridleys_lair", name: "Energy Tank", order100Percent: 38},
-    207: {type: "energy", x: 3686, y: 6821, area: "ridleys_lair", name: "Energy Tank", order100Percent: 42},
-    208: {type: "energy", x: 2088, y: 3142, area: "brinstar", name: "Energy Tank", order100Percent: 44},
+    201: {type: "energy", x: 6264, y: 1574, area: "brinstar", name: "Energy Tank", jpName: "エネルギータンク", order100Percent: 5},
+    202: {type: "energy", x: 6440, y: 4390, area: "norfair", name: "Energy Tank", jpName: "エネルギータンク", order100Percent: 20},
+    203: {type: "energy", x: 6776, y: 614, area: "brinstar", name: "Energy Tank", jpName: "エネルギータンク", order100Percent: 27},
+    204: {type: "energy", x: 2408, y: 5140, area: "kraids_lair", name: "Energy Tank", jpName: "エネルギータンク", order100Percent: 32},
+    205: {type: "energy", x: 2024, y: 6900, area: "norfair", name: "Energy Tank", jpName: "エネルギータンク", order100Percent: 35},
+    206: {type: "energy", x: 4168, y: 5879, area: "ridleys_lair", name: "Energy Tank", jpName: "エネルギータンク", order100Percent: 38},
+    207: {type: "energy", x: 3686, y: 6821, area: "ridleys_lair", name: "Energy Tank", jpName: "エネルギータンク", order100Percent: 42},
+    208: {type: "energy", x: 2088, y: 3142, area: "brinstar", name: "Energy Tank", jpName: "エネルギータンク", order100Percent: 44},
 
     // Missiles
-    301: {type: "missile", x: 4471, y: 2505, area: "brinstar", name: "Missile", order100Percent: 3},
-    302: {type: "missile", x: 4425, y: 3175, area: "norfair", name: "Missile", order100Percent: 8},
-    303: {type: "missile", x: 4168, y: 3416, area: "norfair", name: "Missile", order100Percent: 9},
-    304: {type: "missile", x: 6982, y: 2458, area: "norfair", name: "Missile", order100Percent: 11},
-    305: {type: "missile", x: 6728, y: 2458, area: "norfair", name: "Missile", order100Percent: 12},
-    306: {type: "missile", x: 6468, y: 2458, area: "norfair", name: "Missile", order100Percent: 13},
-    307: {type: "missile", x: 6986, y: 2214, area: "norfair", name: "Missile", order100Percent: 14},
-    308: {type: "missile", x: 6732, y: 2214, area: "norfair", name: "Missile", order100Percent: 15},
-    309: {type: "missile", x: 4936, y: 3418, area: "norfair", name: "Missile", order100Percent: 17},
-    310: {type: "missile", x: 4680, y: 3418, area: "norfair", name: "Missile", order100Percent: 18},
-    311: {type: "missile", x: 4678, y: 5096, area: "norfair", name: "Missile", order100Percent: 21},
-    312: {type: "missile", x: 4934, y: 5096, area: "norfair", name: "Missile", order100Percent: 22},
-    313: {type: "missile", x: 6984, y: 4616, area: "norfair", name: "Missile", order100Percent: 24},
-    314: {type: "missile", x: 6008, y: 584, area: "brinstar", name: "Missile", order100Percent: 26},
-    315: {type: "missile", x: 2167, y: 4873, area: "kraids_lair", name: "Missile", order100Percent: 29},
-    316: {type: "missile", x: 888, y: 4873, area: "kraids_lair", name: "Missile", order100Percent: 30},
-    317: {type: "missile", x: 1144, y: 6313, area: "kraids_lair", name: "Missile", order100Percent: 31},
-    318: {type: "missile", x: 2424, y: 5830, area: "kraids_lair", name: "Missile", order100Percent: 33},
-    320: {type: "missile", x: 4567, y: 5624, area: "ridleys_lair", name: "Missile", order100Percent: 37},
-    321: {type: "missile", x: 5080, y: 7065, area: "ridleys_lair", name: "Missile", order100Percent: 39},
-    322: {type: "missile", x: 6104, y: 6344, area: "ridleys_lair", name: "Missile", order100Percent: 40}
+    301: {type: "missile", x: 4471, y: 2505, area: "brinstar", name: "Missile", jpName: "ミサイル", order100Percent: 3},
+    302: {type: "missile", x: 4425, y: 3175, area: "norfair", name: "Missile", jpName: "ミサイル", order100Percent: 8},
+    303: {type: "missile", x: 4168, y: 3416, area: "norfair", name: "Missile", jpName: "ミサイル", order100Percent: 9},
+    304: {type: "missile", x: 6982, y: 2458, area: "norfair", name: "Missile", jpName: "ミサイル", order100Percent: 11},
+    305: {type: "missile", x: 6728, y: 2458, area: "norfair", name: "Missile", jpName: "ミサイル", order100Percent: 12},
+    306: {type: "missile", x: 6468, y: 2458, area: "norfair", name: "Missile", jpName: "ミサイル", order100Percent: 13},
+    307: {type: "missile", x: 6986, y: 2214, area: "norfair", name: "Missile", jpName: "ミサイル", order100Percent: 14},
+    308: {type: "missile", x: 6732, y: 2214, area: "norfair", name: "Missile", jpName: "ミサイル", order100Percent: 15},
+    309: {type: "missile", x: 4936, y: 3418, area: "norfair", name: "Missile", jpName: "ミサイル", order100Percent: 17},
+    310: {type: "missile", x: 4680, y: 3418, area: "norfair", name: "Missile", jpName: "ミサイル", order100Percent: 18},
+    311: {type: "missile", x: 4678, y: 5096, area: "norfair", name: "Missile", jpName: "ミサイル", order100Percent: 21},
+    312: {type: "missile", x: 4934, y: 5096, area: "norfair", name: "Missile", jpName: "ミサイル", order100Percent: 22},
+    313: {type: "missile", x: 6984, y: 4616, area: "norfair", name: "Missile", jpName: "ミサイル", order100Percent: 24},
+    314: {type: "missile", x: 6008, y: 584, area: "brinstar", name: "Missile", jpName: "ミサイル", order100Percent: 26},
+    315: {type: "missile", x: 2167, y: 4873, area: "kraids_lair", name: "Missile", jpName: "ミサイル", order100Percent: 29},
+    316: {type: "missile", x: 888, y: 4873, area: "kraids_lair", name: "Missile", jpName: "ミサイル", order100Percent: 30},
+    317: {type: "missile", x: 1144, y: 6313, area: "kraids_lair", name: "Missile", jpName: "ミサイル", order100Percent: 31},
+    318: {type: "missile", x: 2424, y: 5830, area: "kraids_lair", name: "Missile", jpName: "ミサイル", order100Percent: 33},
+    320: {type: "missile", x: 4567, y: 5624, area: "ridleys_lair", name: "Missile", jpName: "ミサイル", order100Percent: 37},
+    321: {type: "missile", x: 5080, y: 7065, area: "ridleys_lair", name: "Missile", jpName: "ミサイル", order100Percent: 39},
+    322: {type: "missile", x: 6104, y: 6344, area: "ridleys_lair", name: "Missile", jpName: "ミサイル", order100Percent: 40}
 };
 
 // Collection state array
@@ -209,6 +210,9 @@ $(document).ready(() => {
     // Initialize volume state
     $('.retro-player').removeClass('visible');
     updateVolumeIcon(true); // Start muted
+
+    // Add language toggle handler
+    $('.lang-btn').on('click', toggleLanguage);
 });
 
 function updateCounters() {
@@ -518,12 +522,12 @@ function appendItems($container, items) {
             class: `sprite sprite-${item.type}`
         });
 
-        const $label = $('<span>', {
-            text: item.name
+        const $name = $('<span>', {
+            text: currentLanguage === 'en' ? item.name : item.jpName
         });
 
         $spriteContainer.append($sprite);
-        $item.append($spriteContainer, $label);
+        $item.append($spriteContainer, $name);
         $container.append($item);
 
         $item.on('click', () => {
@@ -807,7 +811,7 @@ function loadStateFromUrl() {
 
 function updateTrackDisplay() {
     const $title = $('#trackTitle');
-    const title = tracks[currentTrack].title;
+    const title = currentLanguage === 'en' ? tracks[currentTrack].title : tracks[currentTrack].jpTitle;
     $title.text(title);
     
     // Remove any existing animation
@@ -1016,4 +1020,14 @@ function toggleItem(index) {
     collectedItems[index] = !collectedItems[index];
     updateItemList();
     createItemOverlay();
+}
+
+// Add language toggle function
+function toggleLanguage() {
+    currentLanguage = currentLanguage === 'en' ? 'jp' : 'en';
+    $('.lang-btn').text(currentLanguage === 'en' ? 'JP' : 'EN');
+    $('.lang-btn').attr('title', `Switch to ${currentLanguage === 'en' ? 'Japanese' : 'English'}`);
+    $('.stats-panel, .track-display').toggleClass('jp', currentLanguage === 'jp');
+    updateItemList();
+    updateTrackDisplay();
 } 

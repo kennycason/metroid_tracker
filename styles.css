@@ -67,9 +67,14 @@ h1 {
     padding: 6px;
     display: flex;
     flex-direction: column;
-    gap: 8px;  /* Back to original */
+    gap: 8px;
     height: 100%;
     overflow-y: auto;
+    transition: width 0.2s ease;
+}
+
+.stats-panel.jp {
+    width: 180px;
 }
 
 .stats-header {
@@ -408,17 +413,40 @@ h1 {
     left: 5px;
     top: 5px;
     z-index: 100;
+    display: flex;
+    gap: 5px;  /* Added consistent spacing */
 }
 
 .volume-btn.standalone {
-    display: block;
+    width: 24px;
+    height: 24px;
+    padding: 3px;
+    background: transparent;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.volume-btn.standalone svg {
+    width: 14px;  /* Match other icons */
+    height: 14px;
+    fill: currentColor;
+}
+
+.volume-btn.standalone:hover {
+    background: var(--accent-color);
+    color: var(--background-color);
 }
 
 .retro-player {
     display: none;
     position: absolute;
     left: 0;
-    top: 0;
+    top: 29px;  /* Updated to account for larger button */
     flex-direction: column;
     gap: 3px;
     background: #222;
@@ -470,6 +498,11 @@ h1 {
     overflow: hidden;
     position: relative;
     width: 135px;
+    transition: width 0.2s ease;
+}
+
+.track-display.jp {
+    width: 180px;
 }
 
 .track-scroller {
@@ -529,4 +562,30 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.lang-btn {
+    width: 24px;
+    height: 24px;
+    padding: 3px;
+    background: transparent;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7em;
+    font-family: 'MetroidFont', 'Arial', sans-serif;
+}
+
+.lang-btn:hover {
+    background: var(--accent-color);
+    color: var(--background-color);
+}
+
+/* Remove flag styles as they're no longer needed */
+.flag-icon, .flag-en, .flag-jp {
+    display: none;
 }
