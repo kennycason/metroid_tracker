@@ -172,7 +172,7 @@ h1 {
 
 /* Item sprite positions */
 .sprite-energy {
-    background-position: -92px -298px;
+    background-position: -90px -298px;
 }
 
 .sprite-missile {
@@ -180,7 +180,7 @@ h1 {
 }
 
 .sprite-maru_mari {
-    background-position: -92px -354px;  /* Two tiles below energy tank */
+    background-position: -90px -354px;  /* Two tiles below energy tank */
 }
 
 .sprite-bombs {
@@ -539,10 +539,38 @@ h1 {
     display: none;
 }
 
-.sprite.next-item {
-    filter: brightness(200%) !important;
-    border: 1px solid #fff;
-    box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+.item-entry.next-item {
+    background-color: rgba(255, 165, 0, 0.2);  /* Subtle orange background */
+}
+
+.item-entry.next-item .sprite {
+    filter: none !important;  /* Remove any grayscale filter */
+    animation: pulse 2s infinite;
+}
+
+/* Map marker specific styles */
+.item-marker.next-item {
+    border: 2px solid orange;
+    box-shadow: 0 0 10px orange;
+    animation: pulse 2s infinite;
+}
+
+.item-marker.next-item .sprite {
+    filter: none !important;
+    border: 1px solid orange;
+    box-shadow: 0 0 8px orange;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
+    100% {
+        opacity: 1;
+    }
 }
 
 .notification {
@@ -739,36 +767,4 @@ h1 {
     color: var(--accent-color);
     position: absolute;
     left: 0;
-}
-
-.item-entry.next-item {
-    background-color: rgba(255, 165, 0, 0.2);  /* Subtle orange background */
-    border: 1px solid orange;
-}
-
-.item-entry.next-item .sprite {
-    filter: none !important;  /* Remove any grayscale filter */
-    animation: pulse 2s infinite;
-}
-
-.item-marker.next-item {
-    border: 2px solid orange;
-    box-shadow: 0 0 10px orange;
-    animation: pulse 2s infinite;
-}
-
-.item-marker.next-item .sprite {
-    filter: none !important;
-}
-
-@keyframes pulse {
-    0% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.6;
-    }
-    100% {
-        opacity: 1;
-    }
 }
