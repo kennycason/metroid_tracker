@@ -131,6 +131,32 @@ $(document).ready(() => {
     $('#nextTrack').on('click', nextTrack);
     $('#loopTrack').on('click', toggleLoop);
     
+    // Add manual button handler
+    $('.manual-btn').on('click', () => {
+        const pdfPath = currentLanguage === 'en' ? 'manual-en.pdf' : 'manual-jp.pdf';
+        $('.manual-modal iframe').attr('src', pdfPath);
+        $('.manual-modal').addClass('visible');
+    });
+
+    // Add close modal handler
+    $('.close-modal').on('click', () => {
+        $('.manual-modal').removeClass('visible');
+    });
+
+    // Close modal on escape key
+    $(document).on('keydown', (e) => {
+        if (e.key === 'Escape') {
+            $('.manual-modal').removeClass('visible');
+        }
+    });
+
+    // Close modal on click outside content
+    $('.manual-modal').on('click', (e) => {
+        if (e.target === e.currentTarget) {
+            $('.manual-modal').removeClass('visible');
+        }
+    });
+    
     // Add click handler for share button
     $('.share-btn').on('click', () => {
         const url = generateShareUrl();
