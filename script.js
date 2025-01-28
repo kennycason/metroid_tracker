@@ -116,6 +116,46 @@ const collectedItems = new Array(Object.keys(items).length).fill(false);
 
 // Initialize the tracker
 $(document).ready(() => {
+    // Initialize audio with error handling
+    audio = new Audio();
+    audio.volume = 0;  // Start muted
+    
+    // Set initial track
+    audio.src = tracks[currentTrack].url;
+    updateTrackDisplay();
+
+    // Add click handlers for audio controls
+    $('.volume-btn').on('click', toggleVolume);
+    $('#prevTrack').on('click', prevTrack);
+    $('#playPause').on('click', togglePlay);
+    $('#nextTrack').on('click', nextTrack);
+    $('#loopTrack').on('click', toggleLoop);
+    
+    // Add click handler for share button
+    $('.share-btn').on('click', () => {
+        const url = generateShareUrl();
+        navigator.clipboard.writeText(url).then(() => {
+            // Show notification
+            const $notification = $('<div class="notification">Share URL copied to clipboard!</div>');
+            $('body').append($notification);
+            setTimeout(() => $notification.addClass('show'), 10);
+            setTimeout(() => {
+                $notification.removeClass('show');
+                setTimeout(() => $notification.remove(), 300);
+            }, 2000);
+        });
+    });
+
+    // Add click handler for language toggle
+    $('.lang-btn').on('click', toggleLanguage);
+
+    // Add click handler for visibility toggle
+    $('.visibility-btn').on('click', () => {
+        showAllItems = !showAllItems;
+        $('.visibility-btn').toggleClass('active', showAllItems);
+        createItemOverlay();
+    });
+
     updateCounters();
     checkItemSequence();
     updateItemList();
@@ -158,6 +198,13 @@ $(document).ready(() => {
             currentNextItem = sortedItems.find(item => 
                 !collectedItems[item.id-1] && item.order100Percent > lastCollectedOrder
             );
+
+            if (currentNextItem) {
+                console.log('Next item to collect:', currentNextItem.name);
+            } else {
+                console.log('No more items to collect in 100% view');
+                currentNextItem = null;
+            }
         } else {
             currentNextItem = null;
         }
@@ -166,53 +213,32 @@ $(document).ready(() => {
         createItemOverlay();
     });
 
-    // Add visibility toggle handler
-    $('.visibility-btn').on('click', () => {
-        showAllItems = !showAllItems;
-        $('.visibility-btn').toggleClass('active', showAllItems);
-        // Update the icon based on state
-        if (showAllItems) {
-            $('.visibility-btn').html('<svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>');
-        } else {
-            $('.visibility-btn').html('<svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg>');
-        }
-        createItemOverlay();
+    // Initialize audio with error handling
+    audio.addEventListener('error', (e) => {
+        console.error('Audio error:', {
+            error: audio.error,
+            code: audio.error ? audio.error.code : null,
+            message: audio.error ? audio.error.message : null,
+            currentSrc: audio.currentSrc,
+            readyState: audio.readyState,
+            networkState: audio.networkState
+        });
     });
 
-    // Load state from URL if parameters exist
-    if (window.location.search) {
-        loadStateFromUrl();
-    }
-
-    // Initialize audio
-    audio = new Audio();
-    audio.src = tracks[0].url; // Set initial track
-    updateTrackDisplay(); // Show initial track title
-    
-    audio.addEventListener('ended', () => {
-        if (isLooping) {
-            audio.currentTime = 0;
-            audio.play().catch(err => {
-                console.error('Failed to play audio:', err);
-            });
-        } else {
-            nextTrack();
-        }
+    // Add load start handler
+    audio.addEventListener('loadstart', () => {
+        console.log('Audio loading started');
     });
 
-    // Add audio control handlers
-    $('.audio-btn#playPause').on('click', togglePlay);
-    $('.audio-btn#prevTrack').on('click', prevTrack);
-    $('.audio-btn#nextTrack').on('click', nextTrack);
-    $('.audio-btn#loopTrack').on('click', toggleLoop);
-    $('.volume-btn').on('click', toggleVolume);
+    // Add can play handler
+    audio.addEventListener('canplay', () => {
+        console.log('Audio can play');
+    });
 
-    // Initialize volume state
-    $('.retro-player').removeClass('visible');
-    updateVolumeIcon(true); // Start muted
-
-    // Add language toggle handler
-    $('.lang-btn').on('click', toggleLanguage);
+    // Add play handler
+    audio.addEventListener('play', () => {
+        console.log('Audio play event fired');
+    });
 });
 
 function updateCounters() {
@@ -830,28 +856,41 @@ function updateTrackDisplay() {
 }
 
 function togglePlay() {
+    console.log('togglePlay called, current isPlaying:', isPlaying);
+    console.log('Current audio source:', audio.src);
+    
     if (!audio.src) {
+        console.log('Setting initial audio source to track:', tracks[currentTrack].title);
         audio.src = tracks[currentTrack].url;
         updateTrackDisplay();
     }
 
     if (isPlaying) {
+        console.log('Pausing audio');
         audio.pause();
         isPlaying = false;
         $('#playPause').removeClass('active');
         $('#playPause').find('svg path').attr('d', 'M8 5v14l11-7z');
-        // Pause the scrolling
         $('#trackTitle').css('animation-play-state', 'paused');
     } else {
+        console.log('Playing audio');
         audio.play().catch(err => {
             console.error('Failed to play audio:', err);
+            // Add more detailed error information
+            console.error('Audio state:', {
+                currentTime: audio.currentTime,
+                readyState: audio.readyState,
+                networkState: audio.networkState,
+                error: audio.error
+            });
         });
         isPlaying = true;
         $('#playPause').addClass('active');
         $('#playPause').find('svg path').attr('d', 'M6 19h4V5H6v14zm8-14v14h4V5h-4z');
-        // Resume the scrolling
         $('#trackTitle').css('animation-play-state', 'running');
     }
+    
+    console.log('Play button state:', $('#playPause').hasClass('active'));
 }
 
 function prevTrack() {
@@ -891,17 +930,25 @@ function toggleLoop() {
 }
 
 function toggleVolume() {
+    console.log('toggleVolume called, current isMuted:', isMuted);
     isMuted = !isMuted;
+    const $volumeBtn = $('.volume-btn.standalone');
     
     if (isMuted) {
+        console.log('Muting audio');
         audio.volume = 0;
         $('.retro-player').removeClass('visible');
+        $volumeBtn.removeClass('active');
     } else {
+        console.log('Unmuting audio');
         audio.volume = 1;
         $('.retro-player').addClass('visible');
+        $volumeBtn.addClass('active');
     }
     
     updateVolumeIcon(isMuted);
+    console.log('Volume button state:', $volumeBtn.hasClass('active'));
+    console.log('Retro player visibility:', $('.retro-player').hasClass('visible'));
 }
 
 function updateVolumeIcon(muted) {
