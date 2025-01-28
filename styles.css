@@ -11,7 +11,10 @@
 
 @font-face {
     font-family: 'MetroidFont';
-    src: url('https://fonts.cdnfonts.com/css/metroid-prime-hunters') format('woff2');
+    src: url('https://fonts.cdnfonts.com/s/7717/Metroid%20Prime%20Hunters.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;  /* Prevent FOIT (Flash of Invisible Text) */
 }
 
 body {
@@ -19,7 +22,7 @@ body {
     padding: 0;
     background-color: var(--background-color);
     color: var(--text-color);
-    font-family: 'MetroidFont', 'Arial', sans-serif;
+    font-family: Arial, sans-serif;  /* Changed to standard font */
     height: 100vh;  /* Full viewport height */
     overflow: hidden;  /* Prevent scrolling */
 }
@@ -48,9 +51,9 @@ h1 {
     text-transform: uppercase;
     letter-spacing: 2px;
     margin: 0;
-    font-size: 2em;
+    font-size: 2.5em;  /* Increased from 2em */
     color: var(--accent-color);
-    font-family: 'MetroidFont', 'Arial', sans-serif;
+    font-family: 'MetroidFont', 'Arial', sans-serif;  /* Keep Metroid font for title */
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
@@ -262,9 +265,11 @@ h1 {
 
 .item-section h3 {
     color: var(--accent-color);
-    margin-bottom: 0;  /* Reduced margins */
+    margin-bottom: 0;
     margin-top: 1px;
-    padding: 1px 0;  /* Added minimal padding */
+    padding: 1px 0;
+    font-family: Arial, sans-serif;  /* Changed to standard font */
+    font-size: 0.9em;
 }
 
 .item-entry {
@@ -392,7 +397,7 @@ h1 {
     border: 1px solid var(--accent-color);
     color: var(--accent-color);
     padding: 2px 3px;
-    font-family: 'MetroidFont', 'Arial', sans-serif;
+    font-family: Arial, sans-serif;  /* Changed to standard font */
     font-size: 0.8em;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -445,14 +450,15 @@ h1 {
 .retro-player {
     display: none;
     position: absolute;
-    left: 0;
-    top: 29px;  /* Updated to account for larger button */
+    left: 100%;  /* Position to the right of the buttons */
+    top: 0;  /* Align with top of buttons */
     flex-direction: column;
     gap: 3px;
     background: #222;
     border: 1px solid var(--accent-color);
     border-radius: 4px;
     padding: 3px;
+    margin-left: 5px;  /* Add some space between buttons and player */
 }
 
 .retro-player.visible {
@@ -509,7 +515,7 @@ h1 {
     position: absolute;
     white-space: nowrap;
     will-change: transform;
-    font-family: 'MetroidFont', 'Arial', sans-serif;
+    font-family: Arial, sans-serif;  /* Changed to standard font */
     color: var(--accent-color);
     font-size: 0.7em;
     line-height: 16px;
@@ -577,7 +583,7 @@ h1 {
     align-items: center;
     justify-content: center;
     font-size: 0.7em;
-    font-family: 'MetroidFont', 'Arial', sans-serif;
+    font-family: Arial, sans-serif;  /* Changed to standard font */
 }
 
 .lang-btn:hover {

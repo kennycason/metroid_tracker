@@ -33,16 +33,16 @@ const itemShortCodes = {
 
 // Audio tracks configuration
 const tracks = [
-    { title: "Intro", jpTitle: "イントロ", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/1%20-%20Intro.mp3" },
+    { title: "Title", jpTitle: "タイトル", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/1%20-%20Intro.mp3" },
     { title: "Brinstar", jpTitle: "ブリンスタ", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/3%20-%20Brinstar.mp3" },
-    { title: "Norfair", jpTitle: "ノーファイア", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/4%20-%20Norfair.mp3" },
-    { title: "Kraid's Lair", jpTitle: "クレイドの巣", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/5%20-%20Kraid%27s%20Lair.mp3" },
-    { title: "Ridley's Lair", jpTitle: "リドリーの巣", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/6%20-%20Ridley%27s%20Lair.mp3" },
-    { title: "Chozos", jpTitle: "チョーゾー", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/7%20-%20Chozos.mp3" },
-    { title: "Tourian", jpTitle: "トーリアン", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/9%20-%20Tourian.mp3" },
-    { title: "Mother Brain", jpTitle: "マザーブレイン", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/10%20-%20Mother%20Brain.mp3" },
-    { title: "Quick Escape", jpTitle: "緊急脱出", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/11%20-%20Quick%20Escape.mp3" },
-    { title: "Mission Completed Successfully", jpTitle: "ミッション完了", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/12%20-%20Mission%20Completed%20Successfully.mp3" }
+    { title: "Norfair", jpTitle: "ノルフェア ", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/4%20-%20Norfair.mp3" },
+    { title: "Kraid", jpTitle: "クレイド", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/5%20-%20Kraid%27s%20Lair.mp3" },
+    { title: "Ridley", jpTitle: "リドリー", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/6%20-%20Ridley%27s%20Lair.mp3" },
+    { title: "Item Room", jpTitle: "アイテムルーム", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/7%20-%20Chozos.mp3" },
+    { title: "Tourian", jpTitle: "ツーリアン", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/9%20-%20Tourian.mp3" },
+    { title: "Zebetite", jpTitle: "ゼベタイト", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/10%20-%20Mother%20Brain.mp3" },
+    { title: "Escape", jpTitle: "脱出", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/11%20-%20Quick%20Escape.mp3" },
+    { title: "Ending", jpTitle: "エンディング", url: "https://fi.zophar.net/soundfiles/nintendo-nes-nsf/metroid/12%20-%20Mission%20Completed%20Successfully.mp3" }
 ];
 
 // Group types for section ordering
