@@ -315,7 +315,7 @@ function initializeMapZoom() {
     }, { passive: false });
 }
 
-// Move applyTransformWithConstraints to global scope
+// Update applyTransformWithConstraints to better scale items
 function applyTransformWithConstraints() {
     const $map = $('#metroid-map');
     const $mapContainer = $('.map-container');
@@ -357,9 +357,14 @@ function applyTransformWithConstraints() {
         'transform': transform
     });
 
-    // Update individual markers to counter the map scale
+    // Update individual markers with better scaling
+    const baseSize = 32; // Original marker size
+    const minSize = 8; // Minimum marker size
+    const maxSize = baseSize; // Maximum marker size
+    const scaleFactor = Math.max(minSize/baseSize, Math.min(1, 1/scale));
+    
     $('.item-marker').css({
-        transform: `scale(${Math.min(2, 1/scale)})`
+        transform: `scale(${scaleFactor})`
     });
 }
 
@@ -893,11 +898,12 @@ function updateVolumeIcon(muted) {
     $volumeBtn.toggleClass('active', !muted);
 }
 
-// Add after initializeMapZoom function
+// Update initializeTouchGestures for better pinch-zoom
 function initializeTouchGestures() {
     const $mapContainer = $('.map-container');
     let lastSingleTouchX, lastSingleTouchY;
     let isSingleTouch = false;
+    let lastPinchCenter = null;
     
     $mapContainer[0].addEventListener('touchstart', (e) => {
         if (e.touches.length === 2) {
@@ -905,6 +911,13 @@ function initializeTouchGestures() {
             isGesturing = true;
             const touch1 = e.touches[0];
             const touch2 = e.touches[1];
+            
+            // Store initial pinch center
+            lastPinchCenter = {
+                x: (touch1.clientX + touch2.clientX) / 2,
+                y: (touch1.clientY + touch2.clientY) / 2
+            };
+            
             lastTouchDistance = Math.hypot(
                 touch2.clientX - touch1.clientX,
                 touch2.clientY - touch1.clientY
@@ -927,30 +940,41 @@ function initializeTouchGestures() {
                 touch2.clientY - touch1.clientY
             );
 
-            // Calculate center point of the two touches
-            const centerX = (touch1.clientX + touch2.clientX) / 2;
-            const centerY = (touch1.clientY + touch2.clientY) / 2;
+            // Calculate current pinch center
+            const currentCenter = {
+                x: (touch1.clientX + touch2.clientX) / 2,
+                y: (touch1.clientY + touch2.clientY) / 2
+            };
 
-            // Convert center point to map coordinates
+            // Convert pinch center to map coordinates
             const rect = $mapContainer[0].getBoundingClientRect();
-            const pointX = (centerX - rect.left - offsetX) / scale;
-            const pointY = (centerY - rect.top - offsetY) / scale;
+            const pointX = (currentCenter.x - rect.left - offsetX) / scale;
+            const pointY = (currentCenter.y - rect.top - offsetY) / scale;
 
             // Calculate scale change with reduced sensitivity
-            const scaleChange = 1 + (currentDistance - lastTouchDistance) / (lastTouchDistance * 4); // Further reduced sensitivity
-            const newScale = Math.min(Math.max(scale * scaleChange, 0.5), 8); // Increased from 4 to 8
+            const scaleChange = 1 + (currentDistance - lastTouchDistance) / (lastTouchDistance * 4);
+            const newScale = Math.min(Math.max(scale * scaleChange, 0.5), 8);
             
             if (newScale !== scale) {
+                // Calculate the movement of the pinch center
+                const centerDeltaX = currentCenter.x - lastPinchCenter.x;
+                const centerDeltaY = currentCenter.y - lastPinchCenter.y;
+                
                 scale = newScale;
                 
-                // Adjust offsets to keep the center point fixed
-                offsetX += centerX - (pointX * scale + offsetX);
-                offsetY += centerY - (pointY * scale + offsetY);
+                // Adjust offsets to keep the pinch center fixed
+                offsetX = currentCenter.x - (pointX * scale);
+                offsetY = currentCenter.y - (pointY * scale);
+                
+                // Add the pinch center movement
+                offsetX += centerDeltaX;
+                offsetY += centerDeltaY;
                 
                 applyTransformWithConstraints();
             }
             
             lastTouchDistance = currentDistance;
+            lastPinchCenter = currentCenter;
         } else if (e.touches.length === 1 && isSingleTouch && scale > 1) {
             // Handle single touch drag
             e.preventDefault();
@@ -971,16 +995,6 @@ function initializeTouchGestures() {
     $mapContainer[0].addEventListener('touchend', () => {
         isGesturing = false;
         isSingleTouch = false;
+        lastPinchCenter = null;
     }, { passive: true });
-
-    // Add touchpad two-finger drag support
-    $mapContainer[0].addEventListener('wheel', (e) => {
-        if (e.ctrlKey) return; // Let the zoom handler deal with pinch-zoom
-        if (scale <= 1) return; // Only allow dragging when zoomed in
-        
-        e.preventDefault();
-        offsetX -= e.deltaX;
-        offsetY -= e.deltaY;
-        applyTransformWithConstraints();
-    }, { passive: false });
 } 
