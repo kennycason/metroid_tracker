@@ -363,8 +363,18 @@ function applyTransformWithConstraints() {
     const maxSize = baseSize; // Maximum marker size
     const scaleFactor = Math.max(minSize/baseSize, Math.min(1, 1/scale));
     
-    $('.item-marker').css({
-        transform: `scale(${scaleFactor})`
+    $('.item-marker').each(function() {
+        const $marker = $(this);
+        const markerX = parseFloat($marker.css('left'));
+        const markerY = parseFloat($marker.css('top'));
+        
+        // Calculate the offset needed to keep the marker centered
+        const offsetAdjustX = (baseSize * (1 - scaleFactor)) / 2;
+        const offsetAdjustY = (baseSize * (1 - scaleFactor)) / 2;
+        
+        $marker.css({
+            transform: `translate(${offsetAdjustX}px, ${offsetAdjustY}px) scale(${scaleFactor})`
+        });
     });
 }
 
