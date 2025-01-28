@@ -544,7 +544,7 @@ h1 {
 }
 
 .item-entry.next-item .sprite {
-    filter: none !important;  /* Remove any grayscale filter */
+    filter: grayscale(100%) brightness(50%) !important;  /* Keep grayscale */
     animation: pulse 2s infinite;
 }
 
@@ -556,7 +556,7 @@ h1 {
 }
 
 .item-marker.next-item .sprite {
-    filter: none !important;
+    filter: none !important;  /* Remove grayscale for map markers */
     border: 1px solid orange;
     box-shadow: 0 0 8px orange;
 }
