@@ -130,6 +130,9 @@ $(document).ready(() => {
     audio.src = tracks[currentTrack].url;
     updateTrackDisplay();
 
+    // Load state from URL if present
+    loadStateFromUrl();
+
     // Add click handlers for audio controls
     $('.volume-btn').on('click', toggleVolume);
     $('#prevTrack').on('click', prevTrack);
