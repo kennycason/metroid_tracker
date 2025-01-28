@@ -61,13 +61,13 @@ h1 {
 }
 
 .stats-panel {
-    width: 125px;  /* Reduced from 145px */
+    width: 145px;  /* Reduced from 165px */
     background: var(--background-color);
     border-right: 1px solid var(--accent-color);
-    padding: 6px;  /* Reduced from 8px */
+    padding: 6px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;  /* Reduced from 8px */
     height: 100%;
     overflow-y: auto;
 }
@@ -133,13 +133,15 @@ h1 {
 
 .item-marker {
     position: absolute;
-    pointer-events: none;
+    pointer-events: all;  /* Changed from none to allow clicking */
     z-index: 11;
     width: 32px;
     height: 32px;
     transform-origin: center;
     margin-left: -16px;  /* Half width to center horizontally */
     margin-top: -16px;   /* Half height to center vertically */
+    cursor: pointer;
+    transition: filter 0.2s ease;
 }
 
 .item-marker .sprite {
@@ -149,6 +151,16 @@ h1 {
     background-image: url('metroid_sprites.jpg');
     background-repeat: no-repeat;
     image-rendering: pixelated;
+    filter: grayscale(100%) brightness(50%);  /* Default uncollected state */
+    transition: filter 0.2s ease;
+}
+
+.item-marker:hover .sprite {
+    filter: grayscale(100%) brightness(75%);  /* Slightly brighter on hover */
+}
+
+.item-marker.collected .sprite {
+    filter: none;  /* Remove grayscale when collected */
 }
 
 /* Item sprite positions */
@@ -252,11 +264,11 @@ h1 {
 .item-entry {
     display: flex;
     align-items: center;
-    gap: 4px;  /* Reduced from 6px */
-    padding: 4px;  /* Reduced from 5px */
-    margin-bottom: 2px;  /* Reduced from 3px */
+    gap: 3px;  /* Reduced from 4px */
+    padding: 3px;  /* Reduced from 4px */
+    margin-bottom: 2px;
     cursor: pointer;
-    font-size: 0.85em;
+    font-size: 0.8em;  /* Reduced from 0.85em */
     white-space: nowrap;
 }
 
@@ -271,8 +283,8 @@ h1 {
 
 /* Replace circle with sprite container */
 .item-entry .sprite-container {
-    width: 24px;  /* Slightly smaller than the overlay sprites */
-    height: 24px;
+    width: 20px;  /* Reduced from 24px */
+    height: 20px;  /* Reduced from 24px */
     position: relative;
     overflow: hidden;
 }
@@ -280,10 +292,10 @@ h1 {
 .item-entry .sprite {
     width: 32px;
     height: 32px;
-    transform: scale(0.75);  /* Scale down to fit container */
+    transform: scale(0.625);  /* Reduced from 0.75 */
     transform-origin: 0 0;
-    filter: grayscale(100%) brightness(50%);  /* Uncollected state */
-    transition: filter 0.2s ease;  /* Smooth transition */
+    filter: grayscale(100%) brightness(50%);
+    transition: filter 0.2s ease;
 }
 
 .item-entry.collected .sprite {
@@ -341,18 +353,10 @@ h1 {
     align-items: center;
 }
 
-.share-btn {
-    width: 28px;  /* Reduced from 32px */
-    height: 28px;
-    padding: 4px;
-    background: transparent;
-    border: 1px solid var(--accent-color);
-    color: var(--accent-color);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.share-btn, .visibility-btn {
+    width: 24px;  /* Reduced from 28px */
+    height: 24px;  /* Reduced from 28px */
+    padding: 3px;  /* Reduced from 4px */
 }
 
 .share-btn:hover, .volume-btn:hover, .loop-btn:hover,
@@ -361,21 +365,21 @@ h1 {
     color: var(--background-color);
 }
 
-.share-btn svg {
-    width: 16px;  /* Reduced from 18px */
-    height: 16px;
+.share-btn svg, .visibility-btn svg {
+    width: 14px;  /* Reduced from 16px */
+    height: 14px;  /* Reduced from 16px */
     fill: currentColor;
 }
 
 .toggle-btn {
     flex: 1;
-    height: 28px;  /* Reduced from 32px */
+    height: 24px;  /* Reduced from 28px */
     background: transparent;
     border: 1px solid var(--accent-color);
     color: var(--accent-color);
-    padding: 2px 4px;  /* Reduced from 4px 6px */
+    padding: 2px 3px;  /* Reduced from 2px 4px */
     font-family: 'MetroidFont', 'Arial', sans-serif;
-    font-size: 0.9em;
+    font-size: 0.8em;  /* Reduced from 0.9em */
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -510,4 +514,28 @@ h1 {
 
 .notification.show {
     opacity: 1;
+}
+
+.visibility-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    padding: 4px;
+}
+
+.visibility-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+
+.visibility-btn:hover {
+    background: var(--accent-color);
+    color: var(--background-color);
+}
+
+.visibility-btn.active {
+    background: var(--accent-color);
+    color: var(--background-color);
 }
