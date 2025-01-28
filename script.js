@@ -18,6 +18,12 @@ let isPlaying = false;
 let isLooping = false;
 let isMuted = true;
 
+// Add PDF viewer state variables
+let pdfDoc = null;
+let pageNum = 1;
+let pageRendering = false;
+let pageNumPending = null;
+
 // Item type mappings
 const itemShortCodes = {
     'maru_mari': 'mm',
@@ -264,6 +270,18 @@ $(document).ready(() => {
     // Add play handler
     audio.addEventListener('play', () => {
         console.log('Audio play event fired');
+    });
+
+    // Add PDF control handlers
+    $('#prev-page').on('click', onPrevPage);
+    $('#next-page').on('click', onNextPage);
+    $('#zoom-in').on('click', () => {
+        scale *= 1.2;
+        renderPage(pageNum);
+    });
+    $('#zoom-out').on('click', () => {
+        scale *= 0.8;
+        renderPage(pageNum);
     });
 });
 
@@ -1103,4 +1121,57 @@ function toggleLanguage() {
     $('.stats-panel, .track-display').toggleClass('jp', currentLanguage === 'jp');
     updateItemList();
     updateTrackDisplay();
+}
+
+function renderPage(num) {
+    pageRendering = true;
+    console.log('Rendering page:', num);
+    
+    pdfDoc.getPage(num).then(function(page) {
+        const viewport = page.getViewport({scale: scale});
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        // Clear previous content
+        const container = document.getElementById('pdf-container');
+        container.innerHTML = '';
+        container.appendChild(canvas);
+
+        const renderContext = {
+            canvasContext: ctx,
+            viewport: viewport
+        };
+
+        page.render(renderContext).promise.then(function() {
+            pageRendering = false;
+            if (pageNumPending !== null) {
+                renderPage(pageNumPending);
+                pageNumPending = null;
+            }
+        });
+
+        document.getElementById('page-num').textContent = num;
+    });
+}
+
+function queueRenderPage(num) {
+    if (pageRendering) {
+        pageNumPending = num;
+    } else {
+        renderPage(num);
+    }
+}
+
+function onPrevPage() {
+    if (pageNum <= 1) return;
+    pageNum--;
+    queueRenderPage(pageNum);
+}
+
+function onNextPage() {
+    if (pageNum >= pdfDoc.numPages) return;
+    pageNum++;
+    queueRenderPage(pageNum);
 } 
