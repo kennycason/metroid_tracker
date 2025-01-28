@@ -61,13 +61,13 @@ h1 {
 }
 
 .stats-panel {
-    width: 145px;  /* Reduced from 165px */
+    width: 135px;
     background: var(--background-color);
     border-right: 1px solid var(--accent-color);
     padding: 6px;
     display: flex;
     flex-direction: column;
-    gap: 6px;  /* Reduced from 8px */
+    gap: 8px;  /* Back to original */
     height: 100%;
     overflow-y: auto;
 }
@@ -248,7 +248,7 @@ h1 {
 */
 
 .item-section {
-    margin-bottom: 3px;
+    margin-bottom: 0;  /* Removed section margin */
 }
 
 .item-section:first-child {
@@ -257,18 +257,19 @@ h1 {
 
 .item-section h3 {
     color: var(--accent-color);
-    margin-bottom: 3px;
-    margin-top: 3px;
+    margin-bottom: 0;  /* Reduced margins */
+    margin-top: 1px;
+    padding: 1px 0;  /* Added minimal padding */
 }
 
 .item-entry {
     display: flex;
     align-items: center;
-    gap: 3px;  /* Reduced from 4px */
-    padding: 3px;  /* Reduced from 4px */
-    margin-bottom: 2px;
+    gap: 8px;
+    padding: 1px 4px;
+    margin-bottom: 0;
     cursor: pointer;
-    font-size: 0.8em;  /* Reduced from 0.85em */
+    font-size: 0.9em;  /* Back to 0.9em */
     white-space: nowrap;
 }
 
@@ -283,8 +284,8 @@ h1 {
 
 /* Replace circle with sprite container */
 .item-entry .sprite-container {
-    width: 20px;  /* Reduced from 24px */
-    height: 20px;  /* Reduced from 24px */
+    width: 32px;  /* Increased to full sprite size */
+    height: 32px;  /* Increased to full sprite size */
     position: relative;
     overflow: hidden;
 }
@@ -292,7 +293,7 @@ h1 {
 .item-entry .sprite {
     width: 32px;
     height: 32px;
-    transform: scale(0.625);  /* Reduced from 0.75 */
+    transform: scale(1);  /* No scaling needed now */
     transform-origin: 0 0;
     filter: grayscale(100%) brightness(50%);
     transition: filter 0.2s ease;
@@ -354,32 +355,40 @@ h1 {
 }
 
 .share-btn, .visibility-btn {
-    width: 24px;  /* Reduced from 28px */
-    height: 24px;  /* Reduced from 28px */
-    padding: 3px;  /* Reduced from 4px */
+    width: 24px;
+    height: 24px;
+    padding: 3px;
+    background: transparent;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.share-btn:hover, .volume-btn:hover, .loop-btn:hover,
-.share-btn.active, .volume-btn.active, .loop-btn.active {
+.share-btn:hover, .visibility-btn:hover,
+.share-btn.active, .visibility-btn.active {
     background: var(--accent-color);
     color: var(--background-color);
 }
 
 .share-btn svg, .visibility-btn svg {
-    width: 14px;  /* Reduced from 16px */
-    height: 14px;  /* Reduced from 16px */
+    width: 14px;
+    height: 14px;
     fill: currentColor;
 }
 
 .toggle-btn {
     flex: 1;
-    height: 24px;  /* Reduced from 28px */
+    height: 24px;
     background: transparent;
     border: 1px solid var(--accent-color);
     color: var(--accent-color);
-    padding: 2px 3px;  /* Reduced from 2px 4px */
+    padding: 2px 3px;
     font-family: 'MetroidFont', 'Arial', sans-serif;
-    font-size: 0.8em;  /* Reduced from 0.9em */
+    font-size: 0.8em;
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -520,22 +529,4 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    padding: 4px;
-}
-
-.visibility-btn svg {
-    width: 18px;
-    height: 18px;
-    fill: currentColor;
-}
-
-.visibility-btn:hover {
-    background: var(--accent-color);
-    color: var(--background-color);
-}
-
-.visibility-btn.active {
-    background: var(--accent-color);
-    color: var(--background-color);
 }
