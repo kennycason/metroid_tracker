@@ -612,10 +612,9 @@ function applyTransformWithConstraints() {
     });
 
     // Update individual markers with scaling that adjusts with zoom
-    const baseSize = 6; // Base marker size
-    const minSize = 4; // Minimum marker size
-    const maxSize = baseSize; // Maximum marker size
-    const scaleFactor = Math.max(minSize/baseSize, Math.min(1, 1/scale));
+    const maxSize = 32; // Maximum size (when zoomed out)
+    const minSize = 16; // Minimum size (when zoomed in)
+    const scaleFactor = Math.max(minSize/maxSize, Math.min(1, 1/scale));
     
     $('.item-marker').each(function() {
         const $marker = $(this);
@@ -623,7 +622,10 @@ function applyTransformWithConstraints() {
         $marker.css({
             left: $marker.data('originalLeft') || $marker.css('left'),
             top: $marker.data('originalTop') || $marker.css('top'),
-            transform: `scale(${1/scale})` // Scale inversely with map zoom
+            transform: `scale(${scaleFactor})`,
+            'transform-style': 'preserve-3d',
+            'backface-visibility': 'hidden',
+            'will-change': 'transform'
         });
         
         // Store original positions if not already stored

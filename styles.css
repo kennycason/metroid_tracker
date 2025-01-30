@@ -106,7 +106,7 @@ h1 {
 }
 
 .total-counter .sprite {
-    margin-bottom: 2px;  /* Added to lift the sprite up relative to the text */
+    margin-bottom: 2px;  
 }
 
 .item-counter {
@@ -138,7 +138,7 @@ h1 {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    object-position: left top;  /* Added to align to top-left */
+    object-position: left top; 
     image-rendering: pixelated;  /* Modern browsers */
     image-rendering: crisp-edges;  /* Firefox */
     -ms-interpolation-mode: nearest-neighbor;  /* IE (just in case) */
@@ -160,15 +160,19 @@ h1 {
 
 .item-marker {
     position: absolute;
-    pointer-events: all;  /* Changed from none to allow clicking */
+    pointer-events: all;
     z-index: 11;
     width: 32px;
     height: 32px;
     transform-origin: center;
-    margin-left: -16px;  /* Half width to center horizontally */
-    margin-top: -16px;   /* Half height to center vertically */
+    margin-left: -16px;
+    margin-top: -16px;
     cursor: pointer;
     transition: filter 0.2s ease;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-crisp-edges;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
 }
 
 .item-marker .sprite {
@@ -177,8 +181,11 @@ h1 {
     transform-origin: center;
     background-image: url('metroid_sprites.jpg');
     background-repeat: no-repeat;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-crisp-edges;
     image-rendering: pixelated;
-    filter: grayscale(100%) brightness(50%);  /* Default uncollected state */
+    image-rendering: crisp-edges;
+    filter: grayscale(100%) brightness(50%);
     transition: filter 0.2s ease;
 }
 
@@ -376,9 +383,9 @@ h1 {
 /* Add Metroid sprite */
 .sprite-metroid {
     background-position: -252px -60px;
-    width: 42px;  /* Reduced from 48px */
-    height: 42px;  /* Reduced from 48px */
-    transform: scale(1.1);  /* Reduced from 1.2 */
+    width: 42px;  
+    height: 42px;  
+    transform: scale(1.1); 
 }
 
 .view-toggle {
@@ -892,4 +899,22 @@ h1 {
 
 .stats-panel.jp.collapsed {
     width: 50px; 
+}
+
+@media (max-width: 768px) {
+    h1 {
+        margin-right: -18px;
+    }
+    
+    header {
+        justify-content: flex-end;  
+        padding-right: 4px;  
+    }
+
+    .sprite-metroid {
+        background-position: -252px -60px;
+        width: 42px;  
+        height: 42px;  
+        transform: scale(1.0);  
+    }
 }
