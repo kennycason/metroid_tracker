@@ -376,7 +376,7 @@ function initializeMapZoom() {
     const $overlay = $('#item-overlay');
     
     const minScale = 0.5;
-    const maxScale = 16;
+    const maxScale = 16;  // This is now the single source of truth for max zoom
     let isHovering = false;
     let isDragging = false;
     let lastX, lastY;
@@ -506,7 +506,7 @@ function handleZoomButton(isZoomIn) {
     
     const scaleStep = 0.4;
     const minScale = 0.5;
-    const maxScale = 16;
+    const maxScale = 16;  // Using the same maxScale value
     
     if (isZoomIn) {
         scale = Math.min(scale * (1 + scaleStep), maxScale);
@@ -844,7 +844,7 @@ function handleWheel(e) {
     // Update scale
     const scaleStep = 0.1;
     const minScale = 0.5;
-    const maxScale = 8;
+    const maxScale = 16;  // Updated to match button zoom
     
     const oldScale = scale;
     if (e.deltaY < 0) {
