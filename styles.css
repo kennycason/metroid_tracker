@@ -768,3 +768,38 @@ h1 {
     position: absolute;
     left: 0;
 }
+
+.zoom-controls {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000;
+}
+
+.zoom-btn {
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid var(--accent-color);
+    color: var(--accent-color);
+    font-size: 24px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0;
+    line-height: 1;
+}
+
+.zoom-btn:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.zoom-btn:active {
+    transform: scale(0.95);
+}
