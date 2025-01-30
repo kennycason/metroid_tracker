@@ -138,6 +138,9 @@ $(document).ready(() => {
         const $panel = $('.stats-panel');
         const isCollapsed = $panel.hasClass('collapsed');
         
+        // Recalculate marker positions immediately before the transition starts
+        createItemOverlay();
+        
         if (isCollapsed) {
             $panel.removeClass('collapsed');
             $(this).html('&lt;');
@@ -145,6 +148,11 @@ $(document).ready(() => {
             $panel.addClass('collapsed');
             $(this).html('&gt;');
         }
+        
+        // Recalculate again after the transition
+        setTimeout(() => {
+            createItemOverlay();
+        }, 300); // Wait for panel animation to complete
     });
 
     // Add click handlers for audio controls
@@ -202,7 +210,84 @@ $(document).ready(() => {
     $('.visibility-btn').on('click', () => {
         showAllItems = !showAllItems;
         $('.visibility-btn').toggleClass('active', showAllItems);
-        createItemOverlay();
+        
+        // Instead of recreating the entire overlay, just toggle visibility of markers
+        Object.entries(items).forEach(([id, item]) => {
+            const isCollected = collectedItems[id-1];
+            const isNextItem = currentView === '100' && currentNextItem && parseInt(id) === currentNextItem.id;
+            const shouldShow = isCollected || isNextItem || showAllItems;
+            
+            const $existingMarker = $(`.item-marker[data-id="${id}"]`);
+            
+            if (shouldShow && !$existingMarker.length) {
+                // Create new marker only if it doesn't exist and should be shown
+                const $container = $('.map-container');
+                const $map = $('#metroid-map');
+                const mapNaturalWidth = $map[0].naturalWidth;
+                const mapNaturalHeight = $map[0].naturalHeight;
+                const containerRect = $container[0].getBoundingClientRect();
+                
+                const containerAspect = containerRect.width / containerRect.height;
+                const mapAspect = mapNaturalWidth / mapNaturalHeight;
+                
+                let displayWidth, displayHeight;
+                if (containerAspect > mapAspect) {
+                    displayHeight = containerRect.height;
+                    displayWidth = displayHeight * mapAspect;
+                } else {
+                    displayWidth = containerRect.width;
+                    displayHeight = displayWidth / mapAspect;
+                }
+                
+                const scaleX = displayWidth / mapNaturalWidth;
+                const scaleY = displayHeight / mapNaturalHeight;
+                
+                let left, top;
+                if (currentView === 'type') {
+                    left = `${item.x * scaleX}px`;
+                    top = `${item.y * scaleY}px`;
+                } else {
+                    left = `${item.x * scaleX}px`;
+                    top = `${item.y * scaleY}px`;
+                }
+                
+                // Calculate current scale factor
+                const maxSize = 32;
+                const minSize = 8;
+                const scaleFactor = Math.max(minSize/maxSize, Math.min(1, 1/scale));
+                
+                const $marker = $('<div>', {
+                    class: `item-marker ${item.type}-marker${isCollected ? ' collected' : ''}${isNextItem ? ' next-item' : ''}`,
+                    'data-id': id,
+                    'data-original-left': left,
+                    'data-original-top': top
+                }).css({
+                    position: 'absolute',
+                    left: left,
+                    top: top,
+                    transform: `scale(${scaleFactor})`,
+                    'transform-style': 'preserve-3d',
+                    'backface-visibility': 'hidden',
+                    'will-change': 'transform'
+                });
+                
+                const $sprite = $('<div>', {
+                    class: `sprite sprite-${item.type}${isNextItem ? ' next-item' : ''}`
+                });
+                
+                $marker.append($sprite);
+                $('#item-overlay').append($marker);
+                
+                $marker.on('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleItem(id-1);
+                });
+            } else if (!shouldShow && $existingMarker.length) {
+                // Remove marker if it exists but shouldn't be shown
+                $existingMarker.remove();
+            }
+        });
     });
 
     updateCounters();
@@ -494,19 +579,17 @@ function initializeMapZoom() {
 
 function handleZoomButton(isZoomIn) {
     const $mapContainer = $('.map-container');
-    const rect = $mapContainer[0].getBoundingClientRect();
-    
-    // Get center point of the container
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
+    const $map = $('#metroid-map');
+    const containerRect = $mapContainer[0].getBoundingClientRect();
+    const mapRect = $map[0].getBoundingClientRect();
     
     // Calculate the point on the map in its natural coordinates
-    const pointX = (centerX - offsetX) / scale;
-    const pointY = (centerY - offsetY) / scale;
+    const pointX = (containerRect.width / 2 - offsetX) / scale;
+    const pointY = (containerRect.height / 2 - offsetY) / scale;
     
     const scaleStep = 0.4;
     const minScale = 0.5;
-    const maxScale = 16;  // Using the same maxScale value
+    const maxScale = 16;
     
     if (isZoomIn) {
         scale = Math.min(scale * (1 + scaleStep), maxScale);
@@ -514,9 +597,9 @@ function handleZoomButton(isZoomIn) {
         scale = Math.max(scale * (1 - scaleStep), minScale);
     }
 
-    // Adjust offsets to keep the center point fixed
-    offsetX = centerX - (pointX * scale);
-    offsetY = centerY - (pointY * scale);
+    // Calculate new offsets to keep the center point fixed
+    offsetX = (containerRect.width / 2) - (pointX * scale);
+    offsetY = (containerRect.height / 2) - (pointY * scale);
 
     applyTransformWithConstraints();
 }
@@ -560,43 +643,7 @@ function initializeTouchGestures() {
 function applyTransformWithConstraints() {
     const $map = $('#metroid-map');
     const $mapContainer = $('.map-container');
-    const containerRect = $mapContainer[0].getBoundingClientRect();
-    const mapRect = $map[0].getBoundingClientRect();
-
-    // Calculate boundaries with some buffer
-    const scaledMapWidth = mapRect.width * scale;
-    const scaledMapHeight = mapRect.height * scale;
     
-    // Allow dragging slightly beyond edges for smoother experience
-    const buffer = 100; // pixels of extra dragging space
-    
-    // Adjust constraints based on container and scaled map size
-    const minX = Math.min(0, containerRect.width - scaledMapWidth) - buffer;
-    const maxX = buffer;
-    const minY = Math.min(0, containerRect.height - scaledMapHeight) - buffer;
-    const maxY = buffer;
-
-    // If map is smaller than container, center it
-    if (scaledMapWidth < containerRect.width) {
-        offsetX = (containerRect.width - scaledMapWidth) / 2;
-    } else {
-        // Constrain offsets
-        offsetX = Math.max(minX, Math.min(maxX, offsetX));
-    }
-
-    if (scaledMapHeight < containerRect.height) {
-        offsetY = (containerRect.height - scaledMapHeight) / 2;
-    } else {
-        // Constrain offsets
-        offsetY = Math.max(minY, Math.min(maxY, offsetY));
-    }
-
-    // If scale is 1 or less, reset position to top-left
-    if (scale <= 1) {
-        offsetX = 0;
-        offsetY = 0;
-    }
-
     // Apply transform without transition for smoother dragging
     const transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
     $map.css({
@@ -613,25 +660,29 @@ function applyTransformWithConstraints() {
 
     // Update individual markers with scaling that adjusts with zoom
     const maxSize = 32; // Maximum size (when zoomed out)
-    const minSize = 16; // Minimum size (when zoomed in)
+    const minSize = 8;  // Minimum size (when zoomed in)
     const scaleFactor = Math.max(minSize/maxSize, Math.min(1, 1/scale));
     
     $('.item-marker').each(function() {
         const $marker = $(this);
-        // Keep original position but add scaling transform
-        $marker.css({
-            left: $marker.data('originalLeft') || $marker.css('left'),
-            top: $marker.data('originalTop') || $marker.css('top'),
-            transform: `scale(${scaleFactor})`,
-            'transform-style': 'preserve-3d',
-            'backface-visibility': 'hidden',
-            'will-change': 'transform'
-        });
+        const markerTransform = `scale(${scaleFactor})`;
         
-        // Store original positions if not already stored
-        if (!$marker.data('originalLeft')) {
-            $marker.data('originalLeft', $marker.css('left'));
-            $marker.data('originalTop', $marker.css('top'));
+        // Only update the transform if it's different
+        if ($marker.css('transform') !== markerTransform) {
+            $marker.css({
+                left: $marker.data('originalLeft') || $marker.css('left'),
+                top: $marker.data('originalTop') || $marker.css('top'),
+                transform: markerTransform,
+                'transform-style': 'preserve-3d',
+                'backface-visibility': 'hidden',
+                'will-change': 'transform'
+            });
+            
+            // Store original positions if not already stored
+            if (!$marker.data('originalLeft')) {
+                $marker.data('originalLeft', $marker.css('left'));
+                $marker.data('originalTop', $marker.css('top'));
+            }
         }
     });
 }
@@ -1096,8 +1147,36 @@ function toggleItem(index) {
         updateNextItem();
     }
     
+    // Update the item list in the side panel
     updateItemList();
-    createItemOverlay();
+    
+    // Instead of recreating the entire overlay, just update the specific marker
+    const $marker = $(`.item-marker[data-id="${index + 1}"]`);
+    if ($marker.length) {
+        $marker.toggleClass('collected', collectedItems[index]);
+        $marker.find('.sprite').toggleClass('next-item', false);  // Remove next-item class
+        
+        // Maintain the current scale factor
+        const maxSize = 32;
+        const minSize = 8;
+        const scaleFactor = Math.max(minSize/maxSize, Math.min(1, 1/scale));
+        const markerTransform = `scale(${scaleFactor})`;
+        
+        $marker.css({
+            transform: markerTransform,
+            'transform-style': 'preserve-3d',
+            'backface-visibility': 'hidden',
+            'will-change': 'transform'
+        });
+    }
+    
+    // If we need to update the next item indicator, only update that specific marker
+    if (currentView === '100' && currentNextItem) {
+        const $nextMarker = $(`.item-marker[data-id="${currentNextItem.id}"]`);
+        if ($nextMarker.length) {
+            $nextMarker.find('.sprite').toggleClass('next-item', true);
+        }
+    }
 }
 
 // Add language toggle function
