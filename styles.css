@@ -75,6 +75,11 @@ h1 {
     overflow-y: auto;
     transition: width 0.3s ease;
     position: relative;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000;
+    will-change: transform;
+    z-index: 20;
 }
 
 .stats-panel.collapsed {
@@ -124,13 +129,19 @@ h1 {
     display: flex;
     background-color: var(--background-color);
     cursor: zoom-in;  /* Show zoom cursor */
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    -ms-interpolation-mode: nearest-neighbor;
 }
 
 #metroid-map {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    object-position: left top;
+    object-position: left top;  /* Added to align to top-left */
+    image-rendering: pixelated;  /* Modern browsers */
+    image-rendering: crisp-edges;  /* Firefox */
+    -ms-interpolation-mode: nearest-neighbor;  /* IE (just in case) */
     display: block;
     transform-origin: 0 0;  /* Set transform origin to top-left */
 }
@@ -245,7 +256,10 @@ h1 {
     width: 100%;
     height: 100%;
     pointer-events: none;
-    z-index: 10;  /* Increased z-index */
+    z-index: 10;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    will-change: transform;
 }
 
 /* Temporarily disabled magnifier styles

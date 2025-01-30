@@ -376,7 +376,7 @@ function initializeMapZoom() {
     const $overlay = $('#item-overlay');
     
     const minScale = 0.5;
-    const maxScale = 8;
+    const maxScale = 16;
     let isHovering = false;
     let isDragging = false;
     let lastX, lastY;
@@ -504,9 +504,9 @@ function handleZoomButton(isZoomIn) {
     const pointX = (centerX - offsetX) / scale;
     const pointY = (centerY - offsetY) / scale;
     
-    const scaleStep = 0.2; // Slightly larger step for buttons
+    const scaleStep = 0.4;
     const minScale = 0.5;
-    const maxScale = 8;
+    const maxScale = 16;
     
     if (isZoomIn) {
         scale = Math.min(scale * (1 + scaleStep), maxScale);
