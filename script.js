@@ -133,6 +133,20 @@ $(document).ready(() => {
     // Load state from URL if present
     loadStateFromUrl();
 
+    // Add collapse button handler
+    $('.collapse-btn').on('click', function() {
+        const $panel = $('.stats-panel');
+        const isCollapsed = $panel.hasClass('collapsed');
+        
+        if (isCollapsed) {
+            $panel.removeClass('collapsed');
+            $(this).html('&lt;');
+        } else {
+            $panel.addClass('collapsed');
+            $(this).html('&gt;');
+        }
+    });
+
     // Add click handlers for audio controls
     $('.volume-btn').on('click', toggleVolume);
     $('#prevTrack').on('click', prevTrack);

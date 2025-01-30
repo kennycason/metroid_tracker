@@ -73,7 +73,12 @@ h1 {
     gap: 8px;
     height: 100%;
     overflow-y: auto;
-    transition: width 0.2s ease;
+    transition: width 0.3s ease;
+    position: relative;
+}
+
+.stats-panel.collapsed {
+    width: 50px;
 }
 
 .stats-panel.jp {
@@ -91,8 +96,12 @@ h1 {
 
 .total-counter {
     display: flex;
-    align-items: center;
-    gap: 8px;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.total-counter .sprite {
+    margin-bottom: 2px;  /* Added to lift the sprite up relative to the text */
 }
 
 .item-counter {
@@ -802,4 +811,71 @@ h1 {
 
 .zoom-btn:active {
     transform: scale(0.95);
+}
+
+.collapse-btn {
+    position: absolute;
+    right: 3px;
+    top: 3px;
+    width: 16px;
+    height: 16px;
+    background: transparent;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    font-size: 10px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.stats-panel:hover .collapse-btn {
+    display: flex;
+    opacity: 1;
+}
+
+.collapse-btn:hover {
+    background: rgba(255, 184, 0, 0.2);
+}
+
+.stats-panel.collapsed .collapse-btn {
+    display: flex;
+    opacity: 0;  /* Changed from 1 to 0 */
+}
+
+.stats-panel.collapsed:hover .collapse-btn {
+    opacity: 1;  /* Added to show button only on hover in collapsed state */
+}
+
+.stats-panel.collapsed .item-entry span,
+.stats-panel.collapsed .denominator,
+.stats-panel.collapsed .item-section h3 {
+    display: none;
+}
+
+.stats-panel.collapsed .view-toggle {
+    flex-direction: column;
+}
+
+.stats-panel.collapsed .toggle-btn {
+    padding: 4px 0;
+    font-size: 0.7em;
+}
+
+.stats-panel.collapsed .item-entry {
+    justify-content: center;
+    padding: 1px 0;
+}
+
+.stats-panel.collapsed .total-counter {
+    justify-content: center;
+    margin-left: 4px; 
+}
+
+.stats-panel.jp.collapsed {
+    width: 50px; 
 }
