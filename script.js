@@ -321,18 +321,17 @@ $(document).ready(() => {
         // Set the view BEFORE calling other functions
         currentView = view;
         
-        // Clear next item when switching to type view
-        if (view === 'type') {
-            currentNextItem = null;
-        } else if (view === '100') {
+        // Initialize next item for 100% view
+        if (view === '100') {
             // Reset all items if none are collected
             if (!collectedItems.some(item => item)) {
                 collectedItems.fill(false);
                 currentNextItem = items[100];
                 currentNextItem.id = 100;
-            } else {
-                updateNextItem();
             }
+            updateNextItem();
+        } else {
+            currentNextItem = null;
         }
         
         updateItemList();
@@ -343,7 +342,12 @@ $(document).ready(() => {
     const activeView = $('.toggle-btn.active').data('view');
     currentView = activeView || 'type';
     
+    // Initialize next item if starting in 100% view
     if (currentView === '100') {
+        if (!collectedItems.some(item => item)) {
+            currentNextItem = items[100];
+            currentNextItem.id = 100;
+        }
         updateNextItem();
     }
 
@@ -1142,21 +1146,102 @@ function updateVolumeIcon(muted) {
 // Update toggleItem to handle view changes
 function toggleItem(index) {
     collectedItems[index] = !collectedItems[index];
+    const isCollected = collectedItems[index];
     
     if (currentView === '100') {
+        // Store old next item ID to remove its highlighting
+        const oldNextItemId = currentNextItem ? currentNextItem.id : null;
+        
+        // Update which item should be next
         updateNextItem();
+        
+        // Update the item entries in the list
+        if (oldNextItemId) {
+            $(`.item-entry[data-id="${oldNextItemId}"]`).removeClass('next-item');
+            $(`.item-entry[data-id="${oldNextItemId}"] .sprite`).removeClass('next-item');
+        }
+        if (currentNextItem) {
+            $(`.item-entry[data-id="${currentNextItem.id}"]`).addClass('next-item');
+            $(`.item-entry[data-id="${currentNextItem.id}"] .sprite`).addClass('next-item');
+        }
     }
     
     // Update the item list in the side panel
     updateItemList();
     
-    // Instead of recreating the entire overlay, just update the specific marker
-    const $marker = $(`.item-marker[data-id="${index + 1}"]`);
-    if ($marker.length) {
-        $marker.toggleClass('collected', collectedItems[index]);
-        $marker.find('.sprite').toggleClass('next-item', false);  // Remove next-item class
+    // Get the item that was clicked
+    const item = items[index + 1];
+    const isNextItem = currentView === '100' && currentNextItem && (index + 1) === currentNextItem.id;
+    
+    // Update or create the marker on the map
+    let $marker = $(`.item-marker[data-id="${index + 1}"]`);
+    
+    // If the marker should be visible (collected, next item, or show all items)
+    if (isCollected || isNextItem || showAllItems) {
+        // Calculate marker position
+        const $container = $('.map-container');
+        const $map = $('#metroid-map');
+        const mapNaturalWidth = $map[0].naturalWidth;
+        const mapNaturalHeight = $map[0].naturalHeight;
+        const containerRect = $container[0].getBoundingClientRect();
         
-        // Maintain the current scale factor
+        const containerAspect = containerRect.width / containerRect.height;
+        const mapAspect = mapNaturalWidth / mapNaturalHeight;
+        
+        let displayWidth, displayHeight;
+        if (containerAspect > mapAspect) {
+            displayHeight = containerRect.height;
+            displayWidth = displayHeight * mapAspect;
+        } else {
+            displayWidth = containerRect.width;
+            displayHeight = displayWidth / mapAspect;
+        }
+        
+        const scaleX = displayWidth / mapNaturalWidth;
+        const scaleY = displayHeight / mapNaturalHeight;
+        
+        const left = `${item.x * scaleX}px`;
+        const top = `${item.y * scaleY}px`;
+        
+        if (!$marker.length) {
+            // Create new marker if it doesn't exist
+            $marker = $('<div>', {
+                class: `item-marker ${item.type}-marker${isCollected ? ' collected' : ''}${isNextItem ? ' next-item' : ''}`,
+                'data-id': index + 1,
+                'data-original-left': left,
+                'data-original-top': top
+            }).css({
+                position: 'absolute',
+                left: left,
+                top: top
+            });
+            
+            const $sprite = $('<div>', {
+                class: `sprite sprite-${item.type}${isNextItem ? ' next-item' : ''}`
+            });
+            
+            $marker.append($sprite);
+            $('#item-overlay').append($marker);
+            
+            // Add click handler to new marker
+            $marker.on('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleItem(index);
+            });
+        } else {
+            // Update existing marker
+            $marker.attr('class', `item-marker ${item.type}-marker${isCollected ? ' collected' : ''}${isNextItem ? ' next-item' : ''}`);
+            $marker.css({
+                left: left,
+                top: top
+            });
+            $marker.data('original-left', left);
+            $marker.data('original-top', top);
+            $marker.find('.sprite').attr('class', `sprite sprite-${item.type}${isNextItem ? ' next-item' : ''}`);
+        }
+        
+        // Update marker scale
         const maxSize = 32;
         const minSize = 8;
         const scaleFactor = Math.max(minSize/maxSize, Math.min(1, 1/scale));
@@ -1168,14 +1253,36 @@ function toggleItem(index) {
             'backface-visibility': 'hidden',
             'will-change': 'transform'
         });
+    } else {
+        // Remove marker if it shouldn't be visible
+        $marker.remove();
     }
     
-    // If we need to update the next item indicator, only update that specific marker
-    if (currentView === '100' && currentNextItem) {
-        const $nextMarker = $(`.item-marker[data-id="${currentNextItem.id}"]`);
-        if ($nextMarker.length) {
-            $nextMarker.find('.sprite').toggleClass('next-item', true);
+    // Update the next item indicator on the map
+    if (currentView === '100') {
+        // Remove next-item class from all markers
+        $('.item-marker .sprite').removeClass('next-item');
+        
+        // Add next-item class to new next item marker if it exists
+        if (currentNextItem) {
+            $(`.item-marker[data-id="${currentNextItem.id}"] .sprite`).addClass('next-item');
+            // Also update the item entry in the list
+            $(`.item-entry[data-id="${currentNextItem.id}"]`).addClass('next-item');
+            $(`.item-entry[data-id="${currentNextItem.id}"] .sprite`).addClass('next-item');
         }
+    }
+    
+    // Apply current transform to overlay to maintain zoom/pan
+    const transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+    $('#item-overlay').css({
+        'transform-origin': '0 0',
+        'transform': transform
+    });
+    
+    // Update next item again to ensure it's properly set
+    if (currentView === '100') {
+        updateNextItem();
+        createItemOverlay();
     }
 }
 
