@@ -716,18 +716,48 @@ h1 {
     margin: 5vh auto;
     background: #000;
     border: 1px solid var(--accent-color);
-    padding: 30px;
-    max-height: 85vh;  /* Reduced from 90vh */
+    padding: 20px;
+    max-height: 85vh;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    box-sizing: border-box;
 }
 
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 24px;
+    height: 24px;
+    background: transparent;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+    padding: 0;
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.close-modal:hover {
+    background: var(--accent-color);
+    color: var(--background-color);
+}
+
+/* Adjust content padding to account for close button */
 .credits-content {
     color: var(--text-color);
     overflow-y: auto;
     padding-right: 10px;
-    max-height: calc(85vh - 60px); /* Account for padding */
+    padding-top: 20px;  /* Add top padding to avoid content overlapping with close button */
+    max-height: calc(85vh - 60px);
+    overflow-x: hidden;
+    box-sizing: border-box;
 }
 
 /* Add custom scrollbar styling */
@@ -755,13 +785,16 @@ h1 {
 .credits-section h2 {
     color: var(--accent-color);
     text-align: center;
-    font-size: 2em;
-    margin-bottom: 25px;  /* Reduced from 30px */
+    font-size: 1.8em; /* Slightly reduced from 2em */
+    margin-bottom: 20px;
     font-family: 'MetroidFont', 'Arial', sans-serif;
+    word-break: break-word; /* Allow long words to break */
 }
 
 .credit-group {
-    margin-bottom: 25px;  /* Reduced from 30px */
+    margin-bottom: 20px;
+    padding: 0 10px;
+    box-sizing: border-box; /* Add this to include padding in width calculation */
 }
 
 .credit-group:last-child {
@@ -772,24 +805,27 @@ h1 {
     color: var(--accent-color);
     border-bottom: 1px solid var(--accent-color);
     padding-bottom: 5px;
-    margin-bottom: 12px;  /* Reduced from 15px */
+    margin-bottom: 12px;
+    font-size: 1em; /* Slightly reduced size */
 }
 
 .credit-group p {
-    margin: 10px 0;
+    margin: 8px 0;
+    font-size: 0.9em; /* Slightly reduced size */
 }
 
 .credit-group ul {
     list-style: none;
     padding: 0;
-    margin: 10px 0;
+    margin: 8px 0;
 }
 
 .credit-group li {
-    margin: 4px 0;  /* Reduced from 5px */
+    margin: 4px 0;
     padding-left: 20px;
     position: relative;
-    line-height: 1.4;  /* Added for better readability while being compact */
+    line-height: 1.4;
+    font-size: 0.9em; /* Slightly reduced size */
 }
 
 .credit-group li:before {
@@ -916,5 +952,44 @@ h1 {
         width: 42px;  
         height: 42px;  
         transform: scale(1.0);  
+    }
+
+    .credits-modal .modal-content,
+    .manual-modal .modal-content {
+        width: 95%;
+        margin: 2.5vh auto;
+        padding: 15px;
+        max-height: 95vh;
+    }
+
+    .credits-content {
+        padding-right: 5px; /* Reduce padding on mobile */
+        max-height: calc(95vh - 50px);
+    }
+
+    .credits-section h2 {
+        font-size: 1.5em;
+        margin-bottom: 15px;
+    }
+
+    .credit-group {
+        margin-bottom: 15px;
+        padding: 0 5px;
+    }
+
+    .credit-group li {
+        padding-left: 15px; /* Reduce bullet point padding on mobile */
+    }
+
+    .manual-modal iframe {
+        height: calc(95vh - 30px);
+    }
+
+    .close-modal {
+        top: 5px;
+        right: 5px;
+        width: 20px;
+        height: 20px;
+        font-size: 14px;
     }
 }
