@@ -402,6 +402,9 @@ function initializeMapZoom() {
             return;
         }
         
+        // Prevent default zoom behavior
+        e.preventDefault();
+        
         const rect = $mapContainer[0].getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
         const mouseY = e.clientY - rect.top;
@@ -608,24 +611,26 @@ function applyTransformWithConstraints() {
         'transform': transform
     });
 
-    // Update individual markers with better scaling
-    const baseSize = 32; // Original marker size
-    const minSize = 8; // Minimum marker size
+    // Update individual markers with scaling that adjusts with zoom
+    const baseSize = 6; // Base marker size
+    const minSize = 4; // Minimum marker size
     const maxSize = baseSize; // Maximum marker size
     const scaleFactor = Math.max(minSize/baseSize, Math.min(1, 1/scale));
     
     $('.item-marker').each(function() {
         const $marker = $(this);
-        const markerX = parseFloat($marker.css('left'));
-        const markerY = parseFloat($marker.css('top'));
-        
-        // Calculate the offset needed to keep the marker centered
-        const offsetAdjustX = (baseSize * (1 - scaleFactor)) / 2;
-        const offsetAdjustY = (baseSize * (1 - scaleFactor)) / 2;
-        
+        // Keep original position but add scaling transform
         $marker.css({
-            transform: `translate(${offsetAdjustX}px, ${offsetAdjustY}px) scale(${scaleFactor})`
+            left: $marker.data('originalLeft') || $marker.css('left'),
+            top: $marker.data('originalTop') || $marker.css('top'),
+            transform: `scale(${1/scale})` // Scale inversely with map zoom
         });
+        
+        // Store original positions if not already stored
+        if (!$marker.data('originalLeft')) {
+            $marker.data('originalLeft', $marker.css('left'));
+            $marker.data('originalTop', $marker.css('top'));
+        }
     });
 }
 
@@ -729,12 +734,10 @@ function createItemOverlay() {
     
     $overlay.empty();
 
-    // Get all relevant dimensions
     const mapNaturalWidth = $map[0].naturalWidth;
     const mapNaturalHeight = $map[0].naturalHeight;
     const containerRect = $container[0].getBoundingClientRect();
 
-    // Calculate the displayed dimensions while maintaining aspect ratio
     const containerAspect = containerRect.width / containerRect.height;
     const mapAspect = mapNaturalWidth / mapNaturalHeight;
 
@@ -747,7 +750,6 @@ function createItemOverlay() {
         displayHeight = displayWidth / mapAspect;
     }
 
-    // Calculate scaling based on the displayed dimensions
     const scaleX = displayWidth / mapNaturalWidth;
     const scaleY = displayHeight / mapNaturalHeight;
 
@@ -757,15 +759,19 @@ function createItemOverlay() {
         const shouldShow = isCollected || isNextItem || showAllItems;
         
         if (shouldShow) {
+            const left = `${item.x * scaleX}px`;
+            const top = `${item.y * scaleY}px`;
+            
             const $marker = $('<div>', {
                 class: `item-marker ${item.type}-marker${isCollected ? ' collected' : ''}${isNextItem ? ' next-item' : ''}`,
-                'data-id': id
+                'data-id': id,
+                'data-original-left': left,
+                'data-original-top': top
             }).css({
                 position: 'absolute',
-                left: `${item.x * scaleX}px`,
-                top: `${item.y * scaleY}px`,
-                transform: `scale(${Math.min(2, 1/scale)})`,
-                'transform-origin': '0 0'
+                left: left,
+                top: top,
+                transform: `scale(${1/scale})` // Apply current zoom scale immediately
             });
 
             const $sprite = $('<div>', {
@@ -775,7 +781,6 @@ function createItemOverlay() {
             $marker.append($sprite);
             $overlay.append($marker);
 
-            // Add click handler
             $marker.on('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -784,7 +789,12 @@ function createItemOverlay() {
         }
     });
 
-    $overlay.css('transform', $map.css('transform'));
+    // Apply current transform to overlay
+    const transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+    $overlay.css({
+        'transform-origin': '0 0',
+        'transform': transform
+    });
 }
 
 // Sort and check items
