@@ -34,7 +34,8 @@ const itemShortCodes = {
     'long_beam': 'lb',
     'bombs': 'b',
     'kraid': 'k',
-    'ridley': 'r'
+    'ridley': 'r',
+    'mother_brain': 'mb'
 };
 
 // Audio tracks configuration
@@ -54,7 +55,7 @@ const tracks = [
 // Group types for section ordering
 const sectionOrder = ["bosses", "items", "energy", "missile"];
 const itemTypes = {
-    "bosses": ["kraid", "ridley"],
+    "bosses": ["kraid", "ridley", "mother_brain"],
     "items": [
         "maru_mari", 
         "bombs", 
@@ -72,6 +73,7 @@ const itemTypes = {
 const items = {
     1: {type: "kraid", x: 1885, y: 6882, area: "kraids_lair", name: "Kraid", jpName: "クレイド", order100Percent: 34},
     2: {type: "ridley", x: 4201, y: 6805, area: "ridleys_lair", name: "Ridley", jpName: "リドリー", order100Percent: 41},
+    3: {type: "mother_brain", x: 330, y: 2513, area: "tourian", name: "Mother Brain", jpName: "マザーブレイン", order100Percent: 45},
     // Items
     100: {type: "maru_mari", x: 360, y: 3270, area: "brinstar", name: "Maru Mari", jpName: "まるまり", order100Percent: 2},
     101: {type: "bombs", x: 6264, y: 1016, area: "brinstar", name: "Bombs", jpName: "ボム", order100Percent: 6},

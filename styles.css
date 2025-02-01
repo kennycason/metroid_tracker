@@ -240,11 +240,14 @@ h1 {
 
 .sprite-kraid {
     background-position: -606px -320px;
-
 }
 
 .sprite-ridley {
     background-position: -189px -132px;
+}
+
+.sprite-mother_brain {
+    background-position: -510px -330px;
 }
 
 /* Specific marker types */
